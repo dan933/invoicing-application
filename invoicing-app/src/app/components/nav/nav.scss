@@ -1,0 +1,27 @@
+nav{
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid transparent;
+    transition: all ease-in-out 0.3s;
+    background: #b3d4fc;
+    // border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    .site-title{
+        color: #fff;
+        font-weight: 400;
+        font-size: 26px;
+         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+}
+
+.nav-float{
+    background-color: rgba(40, 50, 60, 0.97);
+    // border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    // box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+

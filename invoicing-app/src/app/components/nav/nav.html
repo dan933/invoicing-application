@@ -1,0 +1,13 @@
+<nav [class]="scrollY() > 0 ? 'nav-float' : ''">
+    <h1 class="site-title">{{navService.siteTitle}}</h1>
+
+    @if(navService.menuItems().length){
+    <ul>
+        @for (item of navService.menuItems(); track $index) {
+        <li class="nav-item">
+            {{item.label}}
+        </li>
+        }
+    </ul>
+    }
+</nav>

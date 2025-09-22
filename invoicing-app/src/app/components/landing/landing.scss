@@ -1,0 +1,27 @@
+header{
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    justify-content: center;
+
+    div{
+        text-align: center;
+        max-width: 870px;
+        color: #fff;
+    }
+}
+
+.header-desktop{
+    width: 100%;
+    padding-top: 145px;
+    padding-bottom: 195px;
+    background: #b3d4fc;
+
+}
+
+.header-mobile{
+    padding-top: 40px;
+    padding-bottom: 40px;
+    background: #b3d4fc;
+}
+
