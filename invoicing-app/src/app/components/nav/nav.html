@@ -1,4 +1,4 @@
-<nav [class]="scrollY() > 0 ? 'nav-float' : ''">
+<nav [class]="scrollY() > 0 || !isLanding()? 'nav-float' : ''">
     <h1 class="site-title">{{navService.siteTitle}}</h1>
 
     @if(navService.menuItems().length){
@@ -9,5 +9,11 @@
         </li>
         }
     </ul>
+    }
+
+    @if(navService.showTryDemoButton()){
+    <button class="try-demo" (click)="tryDemo()">
+        Try Demo
+    </button>
     }
 </nav>

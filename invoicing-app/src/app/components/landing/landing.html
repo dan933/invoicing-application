@@ -2,7 +2,10 @@
     <div class="overlay-image"></div>
     <header [class]="screenWidth() > 753 ? 'header-desktop':'header-mobile'">
         <div>
-            <h1 class="h1">Manage customers, invoices and generate pdfs all on the one platform.</h1>
+            <h1 [class]="screenWidth() > 700 ? 'h1': 'h1-small'">Manage customers, invoices and generate pdfs all on
+                the
+                one platform.</h1>
+            <button class="btn" (click)="tryDemo()">Try Demo</button>
         </div>
     </header>
 
@@ -59,7 +62,7 @@
                 <input type="text" placeholder="Name" required>
                 <input type="email" placeholder="Email" required>
                 <textarea placeholder="Message" rows="5" required></textarea>
-                <button type="submit">Send Message</button>
+                <button class="btn" type="submit">Send Message</button>
             </form>
         </div>
     </div>
