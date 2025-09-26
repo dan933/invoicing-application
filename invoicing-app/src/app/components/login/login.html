@@ -1,1 +1,16 @@
-<p>login works!</p>
+<section class="page">
+    <div class="overlay-image"></div>
+    <form class="login-card">
+        <h1>Login</h1>
+        <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput placeholder="Ex. email@example.com" [formControl]="email">
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label>Password</mat-label>
+            <input type="password" matInput [formControl]="email">
+        </mat-form-field>
+        <button class="btn">Login</button>
+        <button class="btn">Login Demo</button>
+    </form>
+</section>

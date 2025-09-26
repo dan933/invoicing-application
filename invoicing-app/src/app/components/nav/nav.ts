@@ -14,7 +14,7 @@ export class Nav implements OnInit, OnDestroy {
   navService = inject(NavService);
   screenWidth = signal(window.innerWidth);
   scrollY = signal<number>(0);
-  isLanding = signal<boolean>(false);
+  isFloatingNav = signal<boolean>(false);
 
   routerSubscription: Subscription;
 
@@ -29,10 +29,10 @@ export class Nav implements OnInit, OnDestroy {
         console.log('url', url);
         this.navService.setShowTryDemoButton(url === '/' ? true : false);
 
-        if (url === '/') {
-          this.isLanding.set(true);
+        if (url === '/' || url === '/login') {
+          this.isFloatingNav.set(true);
         } else {
-          this.isLanding.set(false);
+          this.isFloatingNav.set(false);
         }
       }
     });

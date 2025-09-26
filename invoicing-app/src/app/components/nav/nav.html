@@ -1,4 +1,4 @@
-<nav [class]="scrollY() > 0 || !isLanding()? 'nav-float' : ''">
+<nav [class]="scrollY() > 0 || !isFloatingNav()? 'nav-float' : ''">
     <h1 class="site-title">{{navService.siteTitle}}</h1>
 
     @if(navService.menuItems().length){
