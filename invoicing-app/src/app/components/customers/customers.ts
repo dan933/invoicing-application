@@ -14,6 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-customers',
@@ -35,6 +36,7 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './customers.scss',
 })
 export class Customers implements AfterViewInit {
+  router = inject(Router);
   filter = new FormControl('');
   private _httpClient = inject(HttpClient);
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -95,6 +97,12 @@ export class Customers implements AfterViewInit {
         .subscribe((data) => (this.data = data));
     });
   }
+
+  onCustomerRowClick(row: any) {
+    console.log(row);
+
+    this.router.navigate(['/customers-details', row.id]);
+  }
 }
 
 export interface CustomersApi {
@@ -103,6 +111,7 @@ export interface CustomersApi {
 }
 
 export interface Customer {
+  id: string;
   customerCode: string;
   firstName: string;
   lastName: string;
@@ -125,6 +134,7 @@ export class ExampleHttpDatabase {
     return observableOf({
       items: [
         {
+          id: '1',
           customerCode: 'CUST001',
           firstName: 'John',
           lastName: 'Doe',
@@ -133,6 +143,7 @@ export class ExampleHttpDatabase {
           activeStatus: true,
         },
         {
+          id: '2',
           customerCode: 'CUST002',
           firstName: 'Jane',
           lastName: 'Smith',

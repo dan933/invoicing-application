@@ -4,6 +4,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Auth } from '../../services/auth/auth';
+import { NavService } from '../../services/nav/nav';
 
 @Component({
   selector: 'app-login',
@@ -20,6 +21,7 @@ import { Auth } from '../../services/auth/auth';
 })
 export class Login {
   authService = inject(Auth);
+  navService = inject(NavService);
   email = new FormControl('', [Validators.required, Validators.email]);
   password = new FormControl('', [Validators.required]);
 
@@ -39,6 +41,12 @@ export class Login {
 
     const loginResponse = await this.authService
       .login(this.email?.value || '', this.password?.value || '')
+      .then(() => {
+        this.navService.setMenuItems([
+          { link: '/customers', label: 'Customers' },
+          // { link: '/invoices', label: 'Invoices' },
+        ]);
+      })
       .catch((err) => {
         console.log('error Logging in', err);
         this.loginError.set(err?.message || 'Sorry something went wrong');

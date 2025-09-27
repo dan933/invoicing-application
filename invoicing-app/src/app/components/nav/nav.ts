@@ -15,6 +15,7 @@ export class Nav implements OnInit, OnDestroy {
   screenWidth = signal(window.innerWidth);
   scrollY = signal<number>(0);
   isFloatingNav = signal<boolean>(false);
+  currentUrl = signal<string>('');
 
   routerSubscription: Subscription;
 
@@ -22,10 +23,16 @@ export class Nav implements OnInit, OnDestroy {
     this.router.navigate(['/customers']);
   }
 
+  onLinkClick(route: string) {
+    this.router.navigate([route]);
+  }
+
   constructor() {
     this.routerSubscription = this.router.events.subscribe((event: RouterEvent) => {
       if (event instanceof NavigationEnd) {
         const url = event?.urlAfterRedirects || event.url;
+        this.currentUrl.set(url);
+
         console.log('url', url);
         this.navService.setShowTryDemoButton(url === '/' ? true : false);
 
@@ -37,6 +44,7 @@ export class Nav implements OnInit, OnDestroy {
       }
     });
   }
+
   ngOnDestroy(): void {
     this.routerSubscription.unsubscribe();
   }

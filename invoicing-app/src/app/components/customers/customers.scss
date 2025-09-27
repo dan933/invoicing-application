@@ -55,3 +55,13 @@ table {
 .customer-btn-container{
   position: relative; display: flex; gap: 15px; flex-wrap: wrap;
 }
+
+.customer-row{
+  cursor: pointer;
+
+
+  &:hover{
+    background-color: var(--primary-dark);
+    color: var(--white);
+  }
+}

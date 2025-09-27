@@ -1,14 +1,10 @@
 <nav [class]="scrollY() > 0 || !isFloatingNav()? 'nav-float' : ''">
     <h1 class="site-title">{{navService.siteTitle}}</h1>
 
-    @if(navService.menuItems().length){
-    <ul>
-        @for (item of navService.menuItems(); track $index) {
-        <li class="nav-item">
-            {{item.label}}
-        </li>
-        }
-    </ul>
+    @for (item of navService.menuItems(); track $index) {
+    <li [class]="{'nav-item':true, 'nav-active': currentUrl() === item.link}" (click)="onLinkClick(item.link)">
+        {{item.label}}
+    </li>
     }
 
     @if(navService.showTryDemoButton()){
