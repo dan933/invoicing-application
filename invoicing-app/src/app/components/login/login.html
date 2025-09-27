@@ -2,15 +2,45 @@
     <div class="overlay-image"></div>
     <form class="login-card">
         <h1>Login</h1>
-        <mat-form-field appearance="outline">
-            <mat-label>Email</mat-label>
-            <input matInput placeholder="Ex. email@example.com" [formControl]="email">
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-            <mat-label>Password</mat-label>
-            <input type="password" matInput [formControl]="email">
-        </mat-form-field>
-        <button class="btn">Login</button>
-        <button class="btn">Login Demo</button>
+        <div class="login-input">
+            <mat-form-field appearance="outline">
+                <mat-label>Email</mat-label>
+                <input matInput placeholder="Ex. email@example.com" [formControl]="email">
+                @if(email.invalid && email.touched){
+                <mat-error>
+                    Email is required
+                </mat-error>
+                }
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Password</mat-label>
+                <input type="password" matInput [formControl]="password">
+                @if(password.invalid && password.touched){
+                <mat-error>
+                    Password is required
+                </mat-error>
+
+                }
+            </mat-form-field>
+        </div>
+        <button [class]="{btn: !isFormInvalid, 'btn-disabled': isFormInvalid, flex: true, 'justify-center': true}"
+            [disabled]="email.invalid || password.invalid" (click)="login()">
+            @if(loading()){
+            <mat-spinner diameter="20" color="accent"></mat-spinner>
+            }@else {
+            <span>
+                Login
+            </span>
+            }
+        </button>
+        <button class="btn flex justify-center" (click)="login(true)">
+            @if(loading()){
+            <mat-spinner diameter="20" color="accent"></mat-spinner>
+            }@else {
+            <span>
+                Login Demo
+            </span>
+            }
+        </button>
     </form>
 </section>

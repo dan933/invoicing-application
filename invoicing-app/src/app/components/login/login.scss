@@ -11,9 +11,12 @@
 }
 
 .login-card{
-    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     height: 407px;
     width: 400px;
+    margin: 0 15px;
     padding: 10px;
     background-color: #ffff;
     border-radius: 5px;
@@ -23,10 +26,33 @@
         text-align: center;
     }
 
+    .login-input{
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        mat-form-field{
+            margin: 0 auto;
+            max-width: 100%;
+            width: 250px;
+            
+        }
+    }
+
+    button{
+        margin: 0 auto;
+        max-width: 100%;
+        width: 190px;
+    }
+
 }
 
 .page{
+    position: relative;
+    top: 10vh;
     display: flex;
-    height: 91.5vh;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
     width: 100%;
 }

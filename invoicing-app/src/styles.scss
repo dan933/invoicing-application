@@ -141,6 +141,10 @@ button {
   
   --white: #ffffff;
   --black: #000000;
+
+  @include mat.progress-spinner-overrides((
+    active-indicator-color: black,
+  ));
 }
 
 html, body { height: 100%; }
@@ -160,3 +164,16 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
       background: #0056b3;
     }
 }
+
+
+.btn-disabled{
+    padding: 0.75rem;
+    background: #787878;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: not-allowed;
+    font-size: 1rem;
+}
+
+
