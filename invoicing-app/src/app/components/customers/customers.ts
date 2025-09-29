@@ -44,7 +44,7 @@ export class Customers implements AfterViewInit {
 
   showInactiveCustomers = false;
 
-  exampleDatabase!: ExampleHttpDatabase | null;
+  customerData!: HttpDatabase | null;
   data: Customer[] = [];
 
   resultsLength = 0;
@@ -61,7 +61,7 @@ export class Customers implements AfterViewInit {
   ];
 
   ngAfterViewInit() {
-    this.exampleDatabase = new ExampleHttpDatabase(this._httpClient);
+    this.customerData = new HttpDatabase(this._httpClient);
 
     // If the user changes the sort order, reset back to the first page.
     this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
@@ -72,7 +72,7 @@ export class Customers implements AfterViewInit {
           startWith({}),
           switchMap(() => {
             this.isLoadingResults = true;
-            return this.exampleDatabase!.getRepoIssues(
+            return this.customerData!.getCustomers(
               this.sort.active,
               this.sort.direction,
               this.paginator.pageIndex
@@ -122,10 +122,10 @@ export interface Customer {
 
 /** An example database that the data source uses to retrieve data for the table. */
 @Injectable({ providedIn: 'root' })
-export class ExampleHttpDatabase {
+export class HttpDatabase {
   constructor(private _httpClient: HttpClient) {}
 
-  getRepoIssues(sort: string, order: SortDirection, page: number): Observable<CustomersApi> {
+  getCustomers(sort: string, order: SortDirection, page: number): Observable<CustomersApi> {
     // const href = 'https://api.github.com/search/issues';
     // const requestUrl = `${href}?q=repo:angular/components&sort=${sort}&order=${order}&page=${
     //   page + 1

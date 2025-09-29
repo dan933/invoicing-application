@@ -9,17 +9,27 @@
     padding: 20px;
 }
 
+.customer-btn-container{
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.item-container{
+    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+    border: solid var(--secondary) 1px;
+    padding: 20px;
+    font-weight: 400;
+
+    .item-header{
+        font-weight: bold;
+    }
+}
+
 .customer-details-grid{
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    // gap: 5px;
-    padding: 20px;
-
-    .grid-item{
-        box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
-        background-color: var(--secondary);
-        padding: 20px;
-    }
+    gap: 5px;
 
     .span-2 {
         grid-column: span 2;
@@ -30,4 +40,60 @@
     .span-4 {
         grid-column: span 4;
     }
+}
+
+.container {
+  position: relative;
+}
+
+.table-container {
+  position: relative;
+  min-height: 200px;
+  max-height: 400px;
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+}
+
+.loading-shade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 56px;
+  right: 0;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rate-limit-reached {
+  max-width: 360px;
+  text-align: center;
+}
+
+/* Column Widths */
+.mat-column-number,
+.mat-column-state {
+  width: 64px;
+}
+
+.mat-column-created {
+  width: 124px;
+}
+.customer-btn-container{
+  position: relative; display: flex; gap: 15px; flex-wrap: wrap;
+}
+
+.customer-row{
+  cursor: pointer;
+
+
+  &:hover{
+    background-color: var(--primary-dark);
+    color: var(--white);
+  }
 }
