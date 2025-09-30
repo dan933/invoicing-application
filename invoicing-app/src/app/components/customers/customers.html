@@ -1,11 +1,7 @@
 <section class="page">
     <h1>Customers</h1>
     <div class="customer-btn-container">
-        <button class="btn" style="width: 150px;">
-            <span>
-                New Customer
-            </span>
-        </button>
+        <app-new-customer></app-new-customer>
         <mat-slide-toggle style="position: relative; top: 5px;" [(ngModel)]="showInactiveCustomers">
             {{
             showInactiveCustomers ? "All Customers" : "Active Customers"

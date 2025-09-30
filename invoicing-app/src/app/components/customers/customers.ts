@@ -15,6 +15,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { NewCustomer } from './new-customer/new-customer';
 
 @Component({
   selector: 'app-customers',
@@ -31,6 +32,7 @@ import { Router } from '@angular/router';
     MatInputModule,
     MatSlideToggleModule,
     FormsModule,
+    NewCustomer,
   ],
   templateUrl: './customers.html',
   styleUrl: './customers.scss',
