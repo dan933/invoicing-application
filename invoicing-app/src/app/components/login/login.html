@@ -5,7 +5,7 @@
         <div class="login-input">
             <mat-form-field appearance="outline">
                 <mat-label>Email</mat-label>
-                <input matInput placeholder="Ex. email@example.com" [formControl]="email">
+                <input matInput placeholder="Ex. email@example.com" [formControl]="email" autocomplete="email">
                 @if(email.invalid && email.touched){
                 <mat-error>
                     Email is required
@@ -14,7 +14,7 @@
             </mat-form-field>
             <mat-form-field appearance="outline">
                 <mat-label>Password</mat-label>
-                <input type="password" matInput [formControl]="password">
+                <input type="password" matInput [formControl]="password" autocomplete="current-password">
                 @if(password.invalid && password.touched){
                 <mat-error>
                     Password is required

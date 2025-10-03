@@ -1,5 +1,13 @@
 import { HttpClient } from '@angular/common/http';
-import { AfterViewInit, Component, HostListener, inject, signal, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  HostListener,
+  Inject,
+  inject,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -8,9 +16,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatSort, MatSortModule, SortDirection } from '@angular/material/sort';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { catchError, map, merge, Observable, of as observableOf, startWith, switchMap } from 'rxjs';
+import { Invoice, InvoiceApi, InvoiceService } from '../../../services/invoices/invoice-service';
 
 @Component({
   selector: 'app-customer-details',
@@ -34,6 +43,7 @@ import { catchError, map, merge, Observable, of as observableOf, startWith, swit
 })
 export class CustomerDetails implements AfterViewInit {
   screenWidth = signal(window.innerWidth);
+  invoiceService = inject(InvoiceService);
 
   private _httpClient = inject(HttpClient);
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -58,13 +68,11 @@ export class CustomerDetails implements AfterViewInit {
       merge(this.sort.sortChange, this.paginator.page)
         .pipe(
           startWith({}),
-          switchMap(() => {
+          switchMap((): Observable<InvoiceApi | null> => {
             this.isLoadingResults = true;
-            return this.invoiceData!.getInvoices(
-              this.sort.active,
-              this.sort.direction,
-              this.paginator.pageIndex
-            ).pipe(catchError(() => observableOf(null)));
+            return this.invoiceService
+              .getInvoices(this.sort.active, this.sort.direction, this.paginator.pageIndex)
+              .pipe(catchError(() => observableOf(null)));
           }),
           map((data) => {
             // Flip flag to show that loading has finished.
@@ -96,65 +104,6 @@ export class CustomerDetails implements AfterViewInit {
   }
 }
 
-export interface InvoiceApi {
-  items: Invoice[];
-  total_count: number;
-}
-
-export interface Invoice {
-  id: string;
-  invoiceReference: string;
-  invoiceDate: string;
-  subTotal: string;
-  paid: boolean;
-  gst: boolean;
-}
-
 export class HttpDatabase {
   constructor(private _httpClient: HttpClient) {}
-
-  getInvoices(sort: string, order: SortDirection, page: number): Observable<InvoiceApi> {
-    // const href = 'https://api.github.com/search/issues';
-    // const requestUrl = `${href}?q=repo:angular/components&sort=${sort}&order=${order}&page=${
-    //   page + 1
-    // }`;
-
-    let invoiceData: InvoiceApi = {
-      items: [
-        {
-          id: '1',
-          invoiceReference: 'INV0037',
-          invoiceDate: new Date().toLocaleDateString('en-GB', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-          }),
-          subTotal: (1250.5).toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
-          }),
-          paid: false,
-          gst: true,
-        },
-        {
-          id: '2',
-          invoiceReference: 'INV0038',
-          invoiceDate: new Date().toLocaleDateString('en-GB', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-          }),
-          subTotal: (1250.5).toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
-          }),
-          paid: true,
-          gst: false,
-        },
-      ],
-      total_count: 2,
-    };
-
-    return observableOf(invoiceData);
-  }
 }

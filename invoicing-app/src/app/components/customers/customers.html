@@ -1,7 +1,7 @@
 <section class="page">
     <h1>Customers</h1>
     <div class="customer-btn-container">
-        <app-new-customer></app-new-customer>
+        <app-new-customer (customerCreated)="onCustomerCreate()"></app-new-customer>
         <mat-slide-toggle style="position: relative; top: 5px;" [(ngModel)]="showInactiveCustomers">
             {{
             showInactiveCustomers ? "All Customers" : "Active Customers"
@@ -26,8 +26,8 @@
         }
 
         <div class="table-container">
-            <table mat-table [dataSource]="data" class="example-table" matSort matSortActive="customerCode"
-                matSortDisableClear matSortDirection="desc">
+            <table mat-table [dataSource]="customerData().items" class="example-table" matSort
+                matSortActive="customerCode" matSortDisableClear matSortDirection="desc">
                 <ng-container matColumnDef="customerCode">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>Customer Code</th>
                     <td mat-cell *matCellDef="let row">{{row.customerCode}}</td>
@@ -64,7 +64,7 @@
             </table>
         </div>
 
-        <mat-paginator [length]="resultsLength" [pageSize]="30"
+        <mat-paginator [length]="customerData().total_count" [pageSize]="30"
             aria-label="Select page of GitHub search results"></mat-paginator>
     </div>
 </section>

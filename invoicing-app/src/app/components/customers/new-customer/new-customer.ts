@@ -1,11 +1,18 @@
-import { ChangeDetectionStrategy, Component, inject, model, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  model,
+  signal,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
   MatDialogActions,
-  MatDialogClose,
   MatDialogContent,
   MatDialogRef,
   MatDialogTitle,
@@ -15,6 +22,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Utils } from '../../../services/utils/utils';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { CustomerService } from '../../../services/customers/customer-service';
 
 @Component({
   selector: 'app-new-customer',
@@ -24,15 +32,27 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 })
 export class NewCustomer {
   readonly dialog = inject(MatDialog);
+  @Output() customerCreated = new EventEmitter<void>();
+
+  readonly customer = signal<Customer>({
+    id: '',
+    customerCode: '',
+    firstName: '',
+    lastName: '',
+    company: '',
+    email: '',
+    activeStatus: true,
+  });
 
   openDialog(): void {
     const dialogRef = this.dialog.open(DialogCustomer, {});
-  }
-}
 
-export interface DialogData {
-  animal: string;
-  name: string;
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result?.success) {
+        this.customerCreated.emit();
+      }
+    });
+  }
 }
 
 interface Customer {
@@ -57,7 +77,6 @@ interface Customer {
     MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
-    MatDialogClose,
     MatSlideToggleModule,
     MatProgressSpinnerModule,
   ],
@@ -65,7 +84,10 @@ interface Customer {
 export class DialogCustomer {
   readonly dialogRef = inject(MatDialogRef<DialogCustomer>);
   readonly dialog = inject(MatDialog);
+  customerService = inject(CustomerService);
   utils = inject(Utils);
+  readonly data = inject<Customer>(MAT_DIALOG_DATA);
+
   readonly customer = signal<Customer>({
     id: '',
     customerCode: '',
@@ -76,19 +98,6 @@ export class DialogCustomer {
     activeStatus: true,
   });
 
-  openDialog(): void {
-    const dialogRef = this.dialog.open(DialogCustomer, {
-      data: {},
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      console.log('The dialog was closed');
-      if (result !== undefined) {
-        this.customer.set(result);
-      }
-    });
-  }
-
   onNoClick(): void {
     this.dialogRef.close();
   }
@@ -96,11 +105,7 @@ export class DialogCustomer {
   formErrorMessage = signal('');
   loading = signal(false);
 
-  saveCustomer() {
-    console.log(
-      'this.utils.emailCheck(this.customer().email)',
-      this.utils.emailCheck(this.customer().email)
-    );
+  async saveCustomer() {
     if (!this.utils.emailCheck(this.customer().email)) {
       this.formErrorMessage.set('Please enter a valid email address.');
       return;
@@ -114,5 +119,11 @@ export class DialogCustomer {
     }
 
     this.loading.set(true);
+
+    this.customerService.addCustomer({ ...this.customer(), id: crypto.randomUUID() });
+
+    this.dialogRef.close({ success: true, customer: this.customer() });
+
+    this.loading.set(false);
   }
 }
