@@ -73,4 +73,8 @@ export class InvoiceService {
 
     return observableOf({ items: this.invoices(), total_count: this.invoices().length });
   }
+
+  createInvoice(invoice: Invoice) {
+    this._invoices.update((invoices) => [...invoices, invoice]);
+  }
 }

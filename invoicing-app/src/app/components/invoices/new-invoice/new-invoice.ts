@@ -40,10 +40,10 @@ export class DialogNewInvoice {
   loading = signal(false);
 
   async createInvoice() {
-    if (false) {
-      this.formErrorMessage.set('Customer Code is required.');
-      return;
-    }
+    // if (false) {
+    //   this.formErrorMessage.set('Customer Code is required.');
+    //   return;
+    // }
 
     this.loading.set(true);
 

@@ -1,0 +1,110 @@
+<h2 mat-dialog-title>New Invoice</h2>
+<mat-dialog-content style="padding-top: 20px; position: relative;">
+
+    <form class="invoice-form">
+
+        <mat-form-field appearance="outline">
+            <mat-label>Invoice Number</mat-label>
+            <input [disabled]="loading()" matInput [(ngModel)]="invoice().invoiceNumber" name="customerCode" />
+        </mat-form-field>
+
+        <div class="name-row">
+            <mat-form-field appearance="outline">
+                <mat-label>First Name</mat-label>
+                <input [disabled]="loading()" matInput [(ngModel)]="customer().firstName" name="firstName" />
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Last Name</mat-label>
+                <input [disabled]="loading()" matInput [(ngModel)]="customer().lastName" name="lastName" />
+            </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Company</mat-label>
+            <input [disabled]="loading()" matInput [(ngModel)]="customer().company" name="company" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input [disabled]="loading()" matInput [(ngModel)]="customer().email" name="email" type="email" />
+        </mat-form-field>
+
+        @if(formErrorMessage()){
+        <div>
+            <span class="form-error">{{ formErrorMessage() }}</span>
+        </div>
+        }
+
+        <div class="toggle-section">
+            <mat-slide-toggle [(ngModel)]="customer().activeStatus" name="activeStatus">
+                {{ customer().activeStatus ? "Active" : "Not Active" }}
+            </mat-slide-toggle>
+        </div>
+
+    </form>
+
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onNoClick()">Cancel</button>
+    <button [disabled]="loading()" mat-raised-button color="primary" (click)="saveCustomer()" cdkFocusInitial>
+        @if(loading()){
+        <mat-spinner diameter="20" color="accent"></mat-spinner>
+        }@else {
+        <span>
+            Create
+        </span>
+        }
+    </button>
+</mat-dialog-actions>
+
+<style>
+    .customer-form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .name-row {
+        display: flex;
+        gap: 16px;
+    }
+
+    .name-row mat-form-field {
+        flex: 1;
+    }
+
+    .toggle-section {
+        margin-top: 8px;
+    }
+
+    .error-message {
+        color: #f44336;
+        font-size: 14px;
+        margin-top: 16px;
+    }
+
+    @media (max-width: 600px) {
+        .customer-form {
+            gap: 12px;
+        }
+
+        .name-row {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        mat-dialog-content {
+            padding: 16px !important;
+        }
+
+        mat-dialog-actions {
+            padding: 8px 16px !important;
+        }
+
+        mat-dialog-actions button {
+            min-width: 80px;
+        }
+    }
+</style>
