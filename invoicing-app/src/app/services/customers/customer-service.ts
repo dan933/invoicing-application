@@ -1,6 +1,5 @@
 import { Injectable, signal } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
-import { Observable, of as observableOf } from 'rxjs';
 
 export interface Customer {
   id: string;
@@ -63,5 +62,19 @@ export class CustomerService {
 
   addCustomer(newCustomer: Customer) {
     this._customers.update((customers) => [...customers, newCustomer]);
+  }
+
+  getCustomerById(id: string) {
+    return this.customers().find((customer) => customer.id === id) || null;
+  }
+
+  editCustomer(customer: Customer) {
+    this._customers.update((customers) =>
+      customers.map((c) => (c.id === customer.id ? customer : c))
+    );
+  }
+
+  DeleteCustomer(customerCode: string) {
+    this._customers.update((customers) => customers.filter((c) => c.customerCode !== customerCode));
   }
 }

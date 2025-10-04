@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, ViewChild, AfterViewInit, inject, computed } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, inject, computed, signal } from '@angular/core';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule, SortDirection } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
@@ -46,8 +46,8 @@ export class Customers implements AfterViewInit {
   showInactiveCustomers = false;
 
   resultsLength = 0;
-  isLoadingResults = true;
-  isRateLimitReached = false;
+  isLoadingResults = signal(true);
+  isRateLimitReached = signal(false);
 
   displayedColumns: string[] = [
     'customerCode',
@@ -75,11 +75,11 @@ export class Customers implements AfterViewInit {
       this.paginator.pageIndex
     );
 
-    this.isLoadingResults = false;
+    this.isLoadingResults.set(false);
   }
 
   onCustomerCreate() {
-    this.isLoadingResults = true;
+    this.isLoadingResults.set(true);
 
     this.customerService.getCustomers(
       this.sort.active,
@@ -87,7 +87,7 @@ export class Customers implements AfterViewInit {
       this.paginator.pageIndex
     );
 
-    this.isLoadingResults = false;
+    this.isLoadingResults.set(false);
   }
 
   onCustomerRowClick(row: any) {

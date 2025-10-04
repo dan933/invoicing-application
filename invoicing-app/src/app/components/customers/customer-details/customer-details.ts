@@ -20,6 +20,10 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { catchError, map, merge, Observable, of as observableOf, startWith, switchMap } from 'rxjs';
 import { Invoice, InvoiceApi, InvoiceService } from '../../../services/invoices/invoice-service';
+import { EditCustomer } from '../edit-customer/edit-customer';
+import { Customer, CustomerService } from '../../../services/customers/customer-service';
+import { ActivatedRoute } from '@angular/router';
+import { DeleteCustomer } from '../delete-customer/delete-customer';
 
 @Component({
   selector: 'app-customer-details',
@@ -29,7 +33,6 @@ import { Invoice, InvoiceApi, InvoiceService } from '../../../services/invoices/
     MatTableModule,
     MatSortModule,
     MatPaginatorModule,
-    // DatePipe,
     MatButtonModule,
     MatIconModule,
     MatFormFieldModule,
@@ -37,6 +40,8 @@ import { Invoice, InvoiceApi, InvoiceService } from '../../../services/invoices/
     MatInputModule,
     MatSlideToggleModule,
     FormsModule,
+    EditCustomer,
+    DeleteCustomer,
   ],
   templateUrl: './customer-details.html',
   styleUrl: './customer-details.scss',
@@ -44,6 +49,8 @@ import { Invoice, InvoiceApi, InvoiceService } from '../../../services/invoices/
 export class CustomerDetails implements AfterViewInit {
   screenWidth = signal(window.innerWidth);
   invoiceService = inject(InvoiceService);
+  customerService = inject(CustomerService);
+  route = inject(ActivatedRoute);
 
   private _httpClient = inject(HttpClient);
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -51,12 +58,17 @@ export class CustomerDetails implements AfterViewInit {
 
   invoiceData!: HttpDatabase | null;
   data: Invoice[] = [];
+  customer: Customer | null = null;
 
   displayedColumns: string[] = ['invoiceNumber', 'date', 'subTotal', 'paid', 'gst'];
 
   resultsLength = 0;
   isLoadingResults = true;
   isRateLimitReached = false;
+
+  constructor() {
+    this.getCustomer();
+  }
 
   ngAfterViewInit() {
     this.invoiceData = new HttpDatabase(this._httpClient);
@@ -94,7 +106,18 @@ export class CustomerDetails implements AfterViewInit {
     });
   }
 
+  getCustomer() {
+    const customerId = this.route.snapshot.paramMap.get('id');
+    if (customerId) {
+      this.customer = this.customerService.getCustomerById(customerId);
+    }
+  }
+
   onInvoiceRowClick(invoiceId: string) {}
+
+  onCustomerEdit() {
+    this.getCustomer();
+  }
 
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {

@@ -33,7 +33,6 @@ export class Nav implements OnInit, OnDestroy {
         const url = event?.urlAfterRedirects || event.url;
         this.currentUrl.set(url);
 
-        console.log('url', url);
         this.navService.setShowTryDemoButton(url === '/' ? true : false);
 
         if (url === '/' || url === '/login') {

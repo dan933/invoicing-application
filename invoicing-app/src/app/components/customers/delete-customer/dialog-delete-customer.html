@@ -1,0 +1,17 @@
+<h2 mat-dialog-title>Delete Customer</h2>
+<mat-dialog-content style="padding-top: 20px; position: relative;">
+    <p>Are you sure you want to delete customer {{data}}?</p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button (click)="onNoClick()">Cancel</button>
+    <button [disabled]="loading()" mat-raised-button style="color: var(--danger);" (click)="deleteCustomer()"
+        cdkFocusInitial>
+        @if(loading()){
+        <mat-spinner diameter="20" color="accent"></mat-spinner>
+        }@else {
+        <span>
+            Delete
+        </span>
+        }
+    </button>
+</mat-dialog-actions>

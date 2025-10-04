@@ -1,11 +1,10 @@
-<h2 mat-dialog-title>New Invoice</h2>
+<h2 mat-dialog-title>Edit Customer</h2>
 <mat-dialog-content style="padding-top: 20px; position: relative;">
 
-    <form class="invoice-form">
-
+    <form class="customer-form">
         <mat-form-field appearance="outline">
-            <mat-label>Invoice Number</mat-label>
-            <input [disabled]="loading()" matInput [(ngModel)]="invoice().invoiceNumber" name="customerCode" />
+            <mat-label>Customer Code</mat-label>
+            <input [disabled]="loading()" matInput [(ngModel)]="customer().customerCode" name="customerCode" />
         </mat-form-field>
 
         <div class="name-row">
@@ -51,7 +50,7 @@
         <mat-spinner diameter="20" color="accent"></mat-spinner>
         }@else {
         <span>
-            Create
+            Save
         </span>
         }
     </button>

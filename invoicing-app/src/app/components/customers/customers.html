@@ -12,12 +12,12 @@
         <input matInput placeholder="Ex. Joe" [formControl]="filter">
     </mat-form-field>
     <div class="container mat-elevation-z8">
-        @if (isLoadingResults || isRateLimitReached) {
+        @if (isLoadingResults() || isRateLimitReached()) {
         <div class="loading-shade">
-            @if (isLoadingResults) {
+            @if (isLoadingResults()) {
             <mat-spinner></mat-spinner>
             }
-            @if (isRateLimitReached) {
+            @if (isRateLimitReached()) {
             <div class="rate-limit-reached">
                 API rate limit has been reached. It will be reset in one minute.
             </div>
