@@ -1,0 +1,230 @@
+<section class="page">
+    @if (screenWidth() > 700) {
+    <div class="invoice-details-grid">
+        <div class="item-container span-3">
+            <span class="item-header">
+                customer code:
+            </span>
+            <br>
+            <span>
+                {{invoice()?.customerCode}}
+            </span>
+        </div>
+        <div class="item-container span-3">
+            <span class="item-header">
+                Name:
+            </span>
+            <br>
+            <span>
+                {{invoice()?.customerName}}
+            </span>
+        </div>
+        <div class="item-container span-3">
+            <span class="item-header">
+                Company Name:
+            </span>
+            <br>
+            <span>
+                enterprise inc
+            </span>
+        </div>
+        <div class="item-container span-3">
+            <span class="item-header">
+                Email:
+            </span>
+            <br>
+            <span>
+                {{invoice()?.email}}
+            </span>
+        </div>
+        <div class="item-container flex column justify-center span-2">
+            <span class="item-header">
+                Sub Total:
+            </span>
+            <span>
+                {{(invoice()?.subTotal || 0).toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                })}}
+            </span>
+        </div>
+        <div class="item-container flex column justify-center align-center span-2" style="text-align: center;">
+            <span class="item-header">
+                Paid
+            </span>
+            <mat-icon [style]="{'color':invoice()?.paid ? 'green': 'red'}">
+                {{invoice()?.paid ? 'check_circle' : 'cancel'}}
+            </mat-icon>
+        </div>
+        <div class="item-container flex column justify-center align-center span-2" style="text-align: center;">
+            <span class="item-header">
+                GST
+            </span>
+            <mat-icon [style]="{'color':invoice()?.paid ? 'green': 'red'}">
+                {{invoice()?.paid ? 'check_circle' : 'cancel'}}
+            </mat-icon>
+        </div>
+
+    </div>
+    } @else {
+    <div style="display: flex; flex-direction: column; gap:5px;">
+        <div class="item-container" style="text-align: center;">
+            <span class="item-header">
+                customer code:
+            </span>
+            <br>
+            <span>
+                {{invoice()?.customerCode}}
+            </span>
+        </div>
+        <div class="item-container" style="text-align: center;">
+            <span class="item-header">
+                Name:
+            </span>
+            <br>
+            <span>
+                {{invoice()?.customerName}}
+            </span>
+        </div>
+        <div class="item-container" style="text-align: center;">
+            <span class="item-header">
+                Company Name:
+            </span>
+            <br>
+            <span>
+                enterprise inc
+            </span>
+        </div>
+        <div class="item-container" style="text-align: center;">
+            <span class="item-header">
+                Email:
+            </span>
+            <br>
+            <span>
+                {{invoice()?.email}}
+            </span>
+        </div>
+        <div class="item-container flex column justify-center" style="text-align: center;">
+            <span class="item-header">
+                Sub Total:
+            </span>
+            <span>
+                {{(invoice()?.subTotal || 0).toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                })}}
+            </span>
+        </div>
+        <div class="item-container flex column justify-center align-center" style="text-align: center;">
+            <span class="item-header">
+                Paid
+            </span>
+            <mat-icon [style]="{'color':invoice()?.paid ? 'green': 'red'}">
+                {{invoice()?.paid ? 'check_circle' : 'cancel'}}
+            </mat-icon>
+        </div>
+        <div class="item-container flex column justify-center align-center" style="text-align: center;">
+            <span class="item-header">
+                GST
+            </span>
+            <mat-icon [style]="{'color':invoice()?.paid ? 'green': 'red'}">
+                {{invoice()?.paid ? 'check_circle' : 'cancel'}}
+            </mat-icon>
+        </div>
+
+    </div>
+    }
+
+    <!-- Invoice Date Section -->
+    <div class="invoice-input-section">
+        <mat-form-field appearance="outline">
+            <mat-label>Invoice Date</mat-label>
+            <input matInput [matDatepicker]="picker" [value]="invoice()?.invoiceDate"
+                (dateChange)="updateInvoiceDate($event)" placeholder="dd/mm/yyyy">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+        <mat-slide-toggle [checked]="invoice()?.gst" style="position: relative; top: 10px;" (change)="setGst($event)">
+            {{
+            invoice()?.gst ? "GST" : "No GST"
+            }}</mat-slide-toggle>
+    </div>
+
+    <!-- Line Items Section -->
+    <div class="line-items-section">
+        <h2>Line Items</h2>
+
+        <!-- Add New Line Item -->
+        <div class="add-line-item">
+            <div class="line-item-inputs" style="position: relative;">
+                <mat-form-field appearance="outline">
+                    <mat-label>Description</mat-label>
+                    <input matInput placeholder="Item description" (input)="updateNewLineItem('description', $event)">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Quantity</mat-label>
+                    <input matInput type="number" placeholder="1" min="1"
+                        (input)="updateNewLineItem('quantity', $event)">
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Unit Price</mat-label>
+                    <input matInput type="number" placeholder="0.00" step="0.01" min="0"
+                        (input)="updateNewLineItem('unitPrice', $event)">
+                </mat-form-field>
+
+                <button mat-raised-button color="primary" class="add-btn flex justify-center align-center"
+                    style="position: relative;" style="position: relative; bottom: 20px;" (click)="addLineItem()">
+                    <mat-icon>add</mat-icon>
+                    <span>
+                        Add Item
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        @for (item of invoice()?.lineItems; track $index) {
+        <!-- Existing Line Items -->
+        <div class="line-item-row">
+            <mat-form-field appearance="outline">
+                <input matInput [value]="item.description" (input)="updateLineItem($index, 'description', $event)">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <input matInput type="number" [value]="item.quantity"
+                    (input)="updateLineItem($index, 'quantity', $event)" min="1">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <input matInput type="number" [value]="item.unitPrice"
+                    (input)="updateLineItem($index, 'unitPrice', $event)" step="0.01" min="0">
+            </mat-form-field>
+
+            <span class="total-amount">{{(item.quantity * item.unitPrice).toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                })}}</span>
+
+            <div class="actions">
+                <button mat-icon-button color="warn" (click)="removeLineItem($index)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </div>
+        </div>
+        }
+
+
+    </div>
+
+    <!-- Save Button Section -->
+    <div class="save-section">
+        <button style="position: relative;" mat-raised-button color="primary" class="btn" (click)="saveInvoice()">
+            <mat-icon>save</mat-icon>
+            <span style="position: relative; bottom: 6px;">
+                Save Invoice
+            </span>
+        </button>
+    </div>
+
+</section>

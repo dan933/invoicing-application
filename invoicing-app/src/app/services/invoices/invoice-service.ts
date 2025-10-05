@@ -9,11 +9,36 @@ export interface Invoice {
   subTotal: string;
   paid: boolean;
   gst: boolean;
+  lineItems?: {
+    description: string;
+    quantity: number;
+    unitPrice: number;
+    total: number;
+  }[];
 }
 
 export interface InvoiceApi {
   items: Invoice[];
   total_count: number;
+}
+
+export interface InvoiceDetails {
+  id: string;
+  invoiceReference: string;
+  customerCode: string;
+  customerName: string;
+  companyName: string;
+  email: string;
+  invoiceDate: string;
+  subTotal: number;
+  paid: boolean;
+  gst: boolean;
+  lineItems: {
+    description: string;
+    quantity: number;
+    unitPrice: number;
+    total: number;
+  }[];
 }
 
 @Injectable({
@@ -76,5 +101,39 @@ export class InvoiceService {
 
   createInvoice(invoice: Invoice) {
     this._invoices.update((invoices) => [...invoices, invoice]);
+  }
+
+  getInvoiceById(invoiceId: string): Observable<InvoiceDetails | null> {
+    const invoice = this.invoices().find((inv) => inv.id === invoiceId);
+
+    if (invoice) {
+      return observableOf({
+        id: invoice?.id,
+        customerCode: 'CUST0001',
+        customerName: 'John Doe',
+        companyName: 'Acme Corp',
+        email: 'john.doe@example.com',
+        invoiceReference: invoice?.invoiceReference,
+        invoiceDate: invoice?.invoiceDate,
+        subTotal: 1250.5,
+        paid: invoice?.paid,
+        gst: invoice?.gst,
+        lineItems: [
+          {
+            description: 'Software Development',
+            quantity: 1,
+            unitPrice: 1250.5,
+            total: 1250.5,
+          },
+        ],
+      });
+    } else {
+      return observableOf(null);
+    }
+  }
+
+  updateInvoice(invoiceDetails: InvoiceDetails) {
+    console.log('invoiceDetails', invoiceDetails);
+    return observableOf(null);
   }
 }

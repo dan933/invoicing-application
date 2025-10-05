@@ -25,6 +25,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'invoices/:id',
+    loadComponent: () =>
+      import('./components/invoice-details/invoice-details').then((m) => m.InvoiceDetails),
+    canActivate: [authGuard],
+  },
+  {
     path: '**',
     redirectTo: '',
   },

@@ -22,7 +22,7 @@ import { catchError, map, merge, Observable, of as observableOf, startWith, swit
 import { Invoice, InvoiceApi, InvoiceService } from '../../../services/invoices/invoice-service';
 import { EditCustomer } from '../edit-customer/edit-customer';
 import { Customer, CustomerService } from '../../../services/customers/customer-service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DeleteCustomer } from '../delete-customer/delete-customer';
 
 @Component({
@@ -51,6 +51,7 @@ export class CustomerDetails implements AfterViewInit {
   invoiceService = inject(InvoiceService);
   customerService = inject(CustomerService);
   route = inject(ActivatedRoute);
+  router = inject(Router);
 
   private _httpClient = inject(HttpClient);
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -113,7 +114,10 @@ export class CustomerDetails implements AfterViewInit {
     }
   }
 
-  onInvoiceRowClick(invoiceId: string) {}
+  onInvoiceRowClick(invoiceId: string) {
+    console.log('invoiceId', invoiceId);
+    this.router.navigate(['/invoices', invoiceId]);
+  }
 
   onCustomerEdit() {
     this.getCustomer();

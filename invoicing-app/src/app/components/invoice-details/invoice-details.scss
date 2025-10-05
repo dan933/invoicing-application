@@ -1,0 +1,153 @@
+.page{
+    position: relative;
+    top: 10vh;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 90vh;
+    width: 100%;
+    padding: 20px;
+}
+
+
+.invoice-details-grid{
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 5px;
+
+    .span-2 {
+        grid-column: span 2;
+    }
+    .span-3 {
+        grid-column: span 3;
+    }
+    .span-4 {
+        grid-column: span 4;
+    }
+}
+
+.item-container{
+    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+    border: solid var(--secondary) 1px;
+    padding: 20px;
+    font-weight: 400;
+
+    .item-header{
+        font-weight: bold;
+    }
+}
+.invoice-input-section {
+    position: relative;
+    display: flex;
+    column-gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+    
+    mat-form-field {
+        width: 300px;
+    }
+}
+
+.line-items-section {
+    margin-top: 1rem;
+    
+    h2 {
+        margin-bottom: 1rem;
+        color: #333;
+    }
+}
+
+.add-line-item {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.line-item-inputs {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 1rem;
+    align-items: end;
+}
+
+.add-btn {
+    height: 56px;
+}
+
+.line-items-list {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.line-item-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr auto;
+    gap: 1rem;
+    padding: 1rem;
+    align-items: center;
+    
+    &.header {
+        background: #f5f5f5;
+        font-weight: 600;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    &:not(.header) {
+        border-bottom: 1px solid #e0e0e0;
+        
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+}
+
+.total-amount {
+    position: relative;
+    font-weight: 600;
+    color: #2e7d32;
+    bottom: 10px;
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .line-item-inputs {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .line-item-row {
+        position: relative;
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+        
+        &.header {
+            display: none;
+        }
+    }
+    
+    .line-item-row:not(.header) {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+.save-section {
+    margin: 2rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+.save-btn {
+    padding: 12px 32px;
+    font-size: 16px;
+    min-width: 200px;
+}
