@@ -103,11 +103,11 @@ export class InvoiceService {
     this._invoices.update((invoices) => [...invoices, invoice]);
   }
 
-  getInvoiceById(invoiceId: string): Observable<InvoiceDetails | null> {
+  getInvoiceById(invoiceId: string): InvoiceDetails | null {
     const invoice = this.invoices().find((inv) => inv.id === invoiceId);
 
     if (invoice) {
-      return observableOf({
+      return {
         id: invoice?.id,
         customerCode: 'CUST0001',
         customerName: 'John Doe',
@@ -126,9 +126,9 @@ export class InvoiceService {
             total: 1250.5,
           },
         ],
-      });
+      };
     } else {
-      return observableOf(null);
+      return null;
     }
   }
 

@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, signal, LOCALE_ID, OnInit } from '@angular/core';
+import { Component, HostListener, inject, signal, LOCALE_ID } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   Invoice,
@@ -6,7 +6,6 @@ import {
   InvoiceDetails as InvoiceDetailsType,
 } from '../../services/invoices/invoice-service';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -25,32 +24,12 @@ import { FormsModule } from '@angular/forms';
     MatNativeDateModule,
     MatSlideToggle,
     FormsModule,
-    ReactiveFormsModule,
   ],
   providers: [provideNativeDateAdapter(), { provide: LOCALE_ID, useValue: 'en-GB' }],
-  templateUrl: './invoice-details.html',
-  styleUrl: './invoice-details.scss',
+  templateUrl: './new-invoice.html',
+  styleUrl: './new-invoice.scss',
 })
-export class InvoiceDetails implements OnInit {
-  fb = inject(FormBuilder);
-  form = this.fb.group({
-    invoiceDate: ['', Validators.required],
-    lineItems: this.fb.array([]),
-  });
-
-  get lineItems() {
-    return this.form.get('lineItems') as FormArray;
-  }
-
-  createLineItem(): FormGroup {
-    return this.fb.group({
-      description: ['', Validators.required],
-      quantity: ['', Validators.required],
-      unitPrice: ['', Validators.required],
-      total: ['', Validators.required],
-    });
-  }
-
+export class NewInvoice {
   setGst(event: any) {
     const checked = event?.checked;
     console.log('checked', checked);
@@ -78,20 +57,7 @@ export class InvoiceDetails implements OnInit {
     total: 0,
   });
 
-  ngOnInit(): void {
-    if (this.invoiceId) {
-      const invoice = this.invoiceService.getInvoiceById(this.invoiceId);
-      if (invoice) {
-        console.log('invoice', invoice);
-
-        this.form.patchValue({
-          invoiceDate: invoice.invoiceDate,
-        });
-
-        this.invoice.set(invoice);
-      }
-    }
-  }
+  constructor() {}
 
   updateInvoiceDate(event: any) {
     const date = event.value;

@@ -123,6 +123,10 @@ export class CustomerDetails implements AfterViewInit {
     this.getCustomer();
   }
 
+  onNewInvoiceClick() {
+    this.router.navigate(['/invoices/new']);
+  }
+
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
     // console.log('window.innerWidth', window.innerWidth);
