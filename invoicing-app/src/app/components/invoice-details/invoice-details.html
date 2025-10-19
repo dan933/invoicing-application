@@ -7,7 +7,7 @@
             </span>
             <br>
             <span>
-                {{invoice()?.customerCode}}
+                {{this.form.value.customerCode}}
             </span>
         </div>
         <div class="item-container span-3">
@@ -16,7 +16,7 @@
             </span>
             <br>
             <span>
-                {{invoice()?.customerName}}
+                {{this.form.value.customerName}}
             </span>
         </div>
         <div class="item-container span-3">
@@ -25,7 +25,7 @@
             </span>
             <br>
             <span>
-                enterprise inc
+                {{this.form.value.companyName}}
             </span>
         </div>
         <div class="item-container span-3">
@@ -34,7 +34,7 @@
             </span>
             <br>
             <span>
-                {{invoice()?.email}}
+                {{this.form.value.email}}
             </span>
         </div>
         <div class="item-container flex column justify-center span-2">
@@ -42,7 +42,7 @@
                 Sub Total:
             </span>
             <span>
-                {{(invoice()?.subTotal || 0).toLocaleString('en-US', {
+                {{(form.value.subTotal || 0).toLocaleString('en-US', {
                 style: 'currency',
                 currency: 'USD',
                 })}}
@@ -52,16 +52,16 @@
             <span class="item-header">
                 Paid
             </span>
-            <mat-icon [style]="{'color':invoice()?.paid ? 'green': 'red'}">
-                {{invoice()?.paid ? 'check_circle' : 'cancel'}}
+            <mat-icon [style]="{'color':form.value.paid ? 'green': 'red'}">
+                {{form.value.paid ? 'check_circle' : 'cancel'}}
             </mat-icon>
         </div>
         <div class="item-container flex column justify-center align-center span-2" style="text-align: center;">
             <span class="item-header">
                 GST
             </span>
-            <mat-icon [style]="{'color':invoice()?.paid ? 'green': 'red'}">
-                {{invoice()?.paid ? 'check_circle' : 'cancel'}}
+            <mat-icon [style]="{'color':form.value.gst ? 'green': 'red'}">
+                {{form.value.gst ? 'check_circle' : 'cancel'}}
             </mat-icon>
         </div>
 
@@ -74,7 +74,7 @@
             </span>
             <br>
             <span>
-                {{invoice()?.customerCode}}
+                {{this.form.value.customerCode}}
             </span>
         </div>
         <div class="item-container" style="text-align: center;">
@@ -83,7 +83,7 @@
             </span>
             <br>
             <span>
-                {{invoice()?.customerName}}
+                {{this.form.value.customerName}}
             </span>
         </div>
         <div class="item-container" style="text-align: center;">
@@ -92,7 +92,7 @@
             </span>
             <br>
             <span>
-                enterprise inc
+                {{this.form.value.companyName}}
             </span>
         </div>
         <div class="item-container" style="text-align: center;">
@@ -101,7 +101,7 @@
             </span>
             <br>
             <span>
-                {{invoice()?.email}}
+                {{this.form.value.email}}
             </span>
         </div>
         <div class="item-container flex column justify-center" style="text-align: center;">
@@ -109,7 +109,7 @@
                 Sub Total:
             </span>
             <span>
-                {{(invoice()?.subTotal || 0).toLocaleString('en-US', {
+                {{(this.form.value.subTotal || 0).toLocaleString('en-US', {
                 style: 'currency',
                 currency: 'USD',
                 })}}
@@ -119,16 +119,16 @@
             <span class="item-header">
                 Paid
             </span>
-            <mat-icon [style]="{'color':invoice()?.paid ? 'green': 'red'}">
-                {{invoice()?.paid ? 'check_circle' : 'cancel'}}
+            <mat-icon [style]="{'color':this.form.value.paid ? 'green': 'red'}">
+                {{this.form.value.paid ? 'check_circle' : 'cancel'}}
             </mat-icon>
         </div>
         <div class="item-container flex column justify-center align-center" style="text-align: center;">
             <span class="item-header">
                 GST
             </span>
-            <mat-icon [style]="{'color':invoice()?.paid ? 'green': 'red'}">
-                {{invoice()?.paid ? 'check_circle' : 'cancel'}}
+            <mat-icon [style]="{'color':this.form.value.gst ? 'green': 'red'}">
+                {{this.form.value.gst ? 'check_circle' : 'cancel'}}
             </mat-icon>
         </div>
 
@@ -140,7 +140,7 @@
         <div class="invoice-input-section">
             <mat-form-field appearance="outline">
                 <mat-label>Invoice Date</mat-label>
-                <input matInput [matDatepicker]="picker" [value]="invoice()?.invoiceDate"
+                <input matInput [matDatepicker]="picker" formControlName="invoiceDate"
                     (dateChange)="updateInvoiceDate($event)" placeholder="dd/mm/yyyy">
                 <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                 <mat-datepicker #picker></mat-datepicker>

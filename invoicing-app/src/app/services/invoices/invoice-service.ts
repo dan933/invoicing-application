@@ -60,7 +60,7 @@ export class InvoiceService {
           {
             id: '1',
             invoiceReference: 'INV0037',
-            invoiceDate: new Date().toLocaleDateString('en-GB', {
+            invoiceDate: new Date('2025-10-01').toLocaleDateString('en-GB', {
               day: '2-digit',
               month: '2-digit',
               year: 'numeric',

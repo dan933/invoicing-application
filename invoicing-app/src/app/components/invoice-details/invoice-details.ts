@@ -5,7 +5,7 @@ import {
   InvoiceService,
   InvoiceDetails as InvoiceDetailsType,
 } from '../../services/invoices/invoice-service';
-import { provideNativeDateAdapter } from '@angular/material/core';
+import { DateAdapter, provideNativeDateAdapter } from '@angular/material/core';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 
 import { MatIconModule } from '@angular/material/icon';
@@ -15,6 +15,19 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { FormsModule } from '@angular/forms';
+
+export const DD_MM_YYYY_FORMAT = {
+  parse: {
+    dateInput: 'DD/MM/YYYY',
+  },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
+
 @Component({
   selector: 'app-invoice-details',
   imports: [
@@ -32,9 +45,22 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './invoice-details.scss',
 })
 export class InvoiceDetails implements OnInit {
+  constructor(private dateAdapter: DateAdapter<Date>) {
+    this.dateAdapter.setLocale('en-GB');
+  }
+
   fb = inject(FormBuilder);
+
   form = this.fb.group({
-    invoiceDate: ['', Validators.required],
+    invoiceDate: [new Date(), Validators.required],
+    customerCode: ['', Validators.required],
+    customerName: ['', Validators.required],
+    companyName: ['', Validators.required],
+    email: ['', Validators.required],
+    invoiceReference: ['', Validators.required],
+    subTotal: [0, Validators.required],
+    gst: [false],
+    paid: [false],
     lineItems: this.fb.array([]),
   });
 
@@ -85,10 +111,19 @@ export class InvoiceDetails implements OnInit {
         console.log('invoice', invoice);
 
         this.form.patchValue({
-          invoiceDate: invoice.invoiceDate,
+          invoiceDate: invoice?.invoiceDate ? new Date(invoice?.invoiceDate) : new Date(),
+          customerCode: invoice.customerCode,
+          customerName: invoice.customerName,
+          companyName: invoice.companyName,
+          subTotal: invoice.subTotal,
+          invoiceReference: invoice.invoiceReference,
+          email: invoice.email,
+          gst: invoice.gst,
+          paid: invoice.paid,
+          lineItems: invoice.lineItems,
         });
 
-        this.invoice.set(invoice);
+        // this.invoice.set(invoice);
       }
     }
   }
