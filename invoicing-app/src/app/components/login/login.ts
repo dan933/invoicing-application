@@ -5,6 +5,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Auth } from '../../services/auth/auth';
 import { NavService } from '../../services/nav/nav';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -20,12 +21,11 @@ import { NavService } from '../../services/nav/nav';
   standalone: true,
 })
 export class Login {
+  router = inject(Router);
   authService = inject(Auth);
   navService = inject(NavService);
   email = new FormControl('', [Validators.required, Validators.email]);
   password = new FormControl('', [Validators.required]);
-
-  isFormInvalid = computed(() => this.email.invalid || this.password.invalid);
 
   loginError = signal('');
   loading = signal(false);
@@ -35,20 +35,17 @@ export class Login {
     this.loginError.set('');
 
     if (isDemo) {
-      this.email.setValue('admin@example.com');
+      this.email.setValue('admin@proinvoice.com');
       this.password.setValue('examplePassword1234');
     }
 
     const loginResponse = await this.authService
       .login(this.email?.value || '', this.password?.value || '')
       .then(() => {
-        this.navService.setMenuItems([
-          { link: '/customers', label: 'Customers' },
-          // { link: '/invoices', label: 'Invoices' },
-        ]);
+        this.navService.setMenuItems([{ link: '/customers', label: 'Customers' }]);
+        this.router.navigate(['/customers']);
       })
-      .catch((err) => {
-        console.log('error Logging in', err);
+      .catch((err: any) => {
         this.loginError.set(err?.message || 'Sorry something went wrong');
       })
       .finally(() => {

@@ -14,15 +14,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<User>().Property(e => e.Status).HasColumnName("status");
         modelBuilder.Entity<User>().Property(e => e.Email).HasColumnName("email");
         modelBuilder.Entity<User>().Property(e => e.PasswordHash).HasColumnName("passwordhash");
-        modelBuilder.Entity<User>().Property(e => e.CreatedAt).HasColumnName("createdat");
-        modelBuilder.Entity<User>().Property(e => e.Updated).HasColumnName("updated");
+        modelBuilder.Entity<User>().Property(e => e.CreatedAt).HasColumnName("createdat").HasConversion(v => v.ToUniversalTime(), v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+        modelBuilder.Entity<User>().Property(e => e.Updated).HasColumnName("updated").HasConversion(v => v.ToUniversalTime(), v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
         modelBuilder.Entity<Permission>().ToTable("permissions");
         modelBuilder.Entity<Permission>().Property(e => e.Id).HasColumnName("id");
         modelBuilder.Entity<Permission>().Property(e => e.PermissionName).HasColumnName("permission_name");
         modelBuilder.Entity<Permission>().Property(e => e.UserId).HasColumnName("userid");
-        modelBuilder.Entity<Permission>().Property(e => e.CreatedAt).HasColumnName("createdat");
-        modelBuilder.Entity<Permission>().Property(e => e.Updated).HasColumnName("updated");
+        modelBuilder.Entity<Permission>().Property(e => e.CreatedAt).HasColumnName("createdat").HasConversion(v => v.ToUniversalTime(), v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+        modelBuilder.Entity<Permission>().Property(e => e.Updated).HasColumnName("updated").HasConversion(v => v.ToUniversalTime(), v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
         modelBuilder.Entity<Permission>().HasIndex(e => new { e.PermissionName, e.UserId }).IsUnique();
         modelBuilder.Entity<Permission>()
             .HasOne<User>()

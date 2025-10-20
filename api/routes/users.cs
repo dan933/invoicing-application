@@ -63,6 +63,13 @@ public static class UserRoutes
                 return Results.Ok(new { success = true, Message = "Sign up successfull" });
             }
         }).RequireAuthorization();
+        endpoints.MapPost("/users/user/setPassword", async (CreateUserRequest request, UserService service) =>
+        {
+            await service.SetPassword(request.Email, request.Password);
+
+            return Results.Ok(new { success = true, Message = "Password set successfully" });
+
+        });
         endpoints.MapPost("/users/user/permission/set", async (SetUserPermissionRequest request, PermissionService permissionService, ClaimsPrincipal user) =>
         {
 

@@ -3,10 +3,11 @@ import { CanActivateFn, Router } from '@angular/router';
 import { Auth } from '../services/auth/auth';
 
 export const authGuard: CanActivateFn = (route, state) => {
-  const authService = inject(Auth);
   const router = inject(Router);
 
-  if (authService.isLoggedIn() && route?.routeConfig?.path === 'login') {
+  let isLoggedIn = !!localStorage.getItem('token');
+
+  if (isLoggedIn && route?.routeConfig?.path === 'login') {
     return router.createUrlTree(['/customers']);
   }
 
@@ -14,7 +15,7 @@ export const authGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  if (authService.isLoggedIn()) {
+  if (isLoggedIn) {
     return true;
   }
 

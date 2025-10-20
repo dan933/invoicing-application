@@ -53,4 +53,22 @@ public class UserService(AppDbContext _context)
             Updated = user.Updated
         };
     }
+
+    public async Task<UserDto> SetPassword(string email, string password)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email) ?? throw new KeyNotFoundException("User not found");
+
+        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+
+        user.PasswordHash = hashedPassword;
+        user.Updated = DateTime.UtcNow;
+
+        _context.Users.Update(user);
+
+        await _context.SaveChangesAsync();
+
+        return new UserDto { Id = user.Id, Status = user.Status, Email = user.Email, CreatedAt = user.CreatedAt, Updated = user.Updated };
+
+
+    }
 }

@@ -23,7 +23,13 @@
                 }
             </mat-form-field>
         </div>
-        <button [class]="{btn: !isFormInvalid, 'btn-disabled': isFormInvalid, flex: true, 'justify-center': true}"
+        @if(loginError()) {
+        <div class="error-message">
+            {{ loginError() }}
+        </div>
+        }
+        <button
+            [class]="{btn: email.valid && password.valid, 'btn-disabled': email.invalid || password.invalid, flex: true, 'justify-center': true}"
             [disabled]="email.invalid || password.invalid" (click)="login()">
             @if(loading()){
             <mat-spinner diameter="20" color="accent"></mat-spinner>
