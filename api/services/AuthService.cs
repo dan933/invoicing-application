@@ -9,7 +9,7 @@ using System.Text;
 namespace api.services;
 
 
-public class AuthService(AppDbContext _context)
+public class AuthService(AppDbContext _context, IConfiguration configuration)
 {
 
     public async Task<string?> Login(string email, string password)
@@ -24,15 +24,16 @@ public class AuthService(AppDbContext _context)
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email)
+            new Claim(ClaimTypes.Email, user.Email),
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("your-secret-key-here-must-be-at-least-32-characters-long"));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+
         var token = new JwtSecurityToken(
-            issuer: "invoicing-app",
-            audience: "invoicing-app",
+            issuer: configuration["Jwt:Issuer"],
+            audience: configuration["Jwt:Audience"],
             claims: claims,
             expires: DateTime.Now.AddHours(1),
             signingCredentials: creds);

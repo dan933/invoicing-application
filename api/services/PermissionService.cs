@@ -40,4 +40,11 @@ public class PermissionService(AppDbContext _context)
 
         return permission;
     }
+
+    public async Task<Boolean> HasPermission(Guid userId, string permissionName)
+    {
+        var permission = await _context.Permissions.FirstOrDefaultAsync(p => p.UserId == userId && p.PermissionName == permissionName);
+
+        return permission != null;
+    }
 }
