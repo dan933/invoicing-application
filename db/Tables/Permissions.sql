@@ -1,11 +1,9 @@
-DROP TABLE IF EXISTS Permissions;
-CREATE TABLE Permissions (
+DROP TABLE IF EXISTS permissions;
+CREATE TABLE permissions (
     Id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    Permission_name VARCHAR(50) NOT NULL DEFAULT '',
-    UserId UUID REFERENCES Users(Id),
-    CreatedAt TIMESTAMP NOT NULL DEFAULT NOW(),
-    Updated TIMESTAMP NOT NULL DEFAULT NOW(),
-    UNIQUE(Permission_name, UserId)
+    permission_name VARCHAR(50) NOT NULL DEFAULT '',
+    user_id UUID REFERENCES Users(Id),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE(Permission_name, user_id)
 );
-
-select * from permissions;
