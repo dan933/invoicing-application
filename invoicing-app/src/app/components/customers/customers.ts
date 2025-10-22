@@ -67,12 +67,20 @@ export class Customers implements AfterViewInit {
     // If the user changes the sort order, reset back to the first page.
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
+
+      this.customerService.getCustomers(
+        this.sort.active,
+        this.sort.direction,
+        this.paginator.pageIndex,
+        this.paginator.pageSize
+      );
     });
 
     this.customerService.getCustomers(
       this.sort.active,
       this.sort.direction,
-      this.paginator.pageIndex
+      this.paginator.pageIndex,
+      this.paginator.pageSize
     );
 
     this.isLoadingResults.set(false);
@@ -84,7 +92,8 @@ export class Customers implements AfterViewInit {
     this.customerService.getCustomers(
       this.sort.active,
       this.sort.direction,
-      this.paginator.pageIndex
+      this.paginator.pageIndex,
+      this.paginator.pageSize
     );
 
     this.isLoadingResults.set(false);

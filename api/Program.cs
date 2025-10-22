@@ -45,6 +45,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<PermissionService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<CustomerService>();
 
 
 var app = builder.Build();
@@ -62,6 +63,7 @@ app.UseHttpsRedirection();
 
 app.MapUserEndpoints();
 app.MapAuthEndpoints();
+app.MapCustomerEndpoints();
 
 app.Run();
 

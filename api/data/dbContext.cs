@@ -29,6 +29,18 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasOne<User>()
             .WithMany()
             .HasForeignKey(p => p.UserId);
+
+        modelBuilder.Entity<Customer>().ToTable("customers");
+        modelBuilder.Entity<Customer>().Property(e => e.Id).HasColumnName("id");
+        modelBuilder.Entity<Customer>().Property(e => e.Status).HasColumnName("status");
+        modelBuilder.Entity<Customer>().Property(e => e.CustomerCode).HasColumnName("customer_code");
+        modelBuilder.Entity<Customer>().Property(e => e.FirstName).HasColumnName("first_name");
+        modelBuilder.Entity<Customer>().Property(e => e.LastName).HasColumnName("last_name");
+        modelBuilder.Entity<Customer>().Property(e => e.Company).HasColumnName("company");
+        modelBuilder.Entity<Customer>().Property(e => e.Email).HasColumnName("email");
+        modelBuilder.Entity<Customer>().Property(e => e.ActiveStatus).HasColumnName("active_status");
+        modelBuilder.Entity<Customer>().Property(e => e.CreatedAt).HasColumnName("created_at").HasConversion(v => v.ToUniversalTime(), v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+        modelBuilder.Entity<Customer>().Property(e => e.UpdatedAt).HasColumnName("updated_at").HasConversion(v => v.ToUniversalTime(), v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
     }
 
     public class User
@@ -53,7 +65,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     public class Customer
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public string Status { get; set; } = "";
         public string CustomerCode { get; set; } = "";
         public string FirstName { get; set; } = "";

@@ -1,5 +1,8 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { SortDirection } from '@angular/material/sort';
+import { Auth } from '../auth/auth';
+import { environment } from '../../../environments/environment';
+import { Api } from '../api/api';
 
 export interface Customer {
   id: string;
@@ -20,44 +23,42 @@ export interface CustomersResponse {
   providedIn: 'root',
 })
 export class CustomerService {
+  auth = inject(Auth);
+  api = inject(Api);
   private readonly _customers = signal<Customer[]>([]);
+  private readonly _total_count = signal<number>(0);
+
   customers = this._customers.asReadonly();
+  total_count = this._total_count.asReadonly();
 
   customerData = {
     items: this._customers.asReadonly(),
-    total_count: this._customers().length,
+    total_count: this._total_count.asReadonly(),
   };
 
-  getCustomers(sort: string, order: SortDirection, page: number): void {
-    // const href = 'https://api.github.com/search/issues';
-    // const requestUrl = `${href}?q=repo:angular/components&sort=${sort}&order=${order}&page=${
-    //   page + 1
-    // }`;
+  async getCustomers(
+    sort: string,
+    order: SortDirection,
+    page: number,
+    pageSize: number
+  ): Promise<{
+    items: Customer[];
+    total_count: number;
+  }> {
+    const customersResponse = await this.api.Post(`${environment.apiUrl}/customers/list`, {
+      sortColumn: sort,
+      sortDirection: order,
+      page: page + 1,
+      pageSize,
+    });
 
-    if (!this.customers()?.length) {
-      let customers: Customer[] = [
-        {
-          id: '1',
-          customerCode: 'CUST001',
-          firstName: 'John',
-          lastName: 'Doe',
-          company: 'Acme Corp',
-          email: 'john.doe@acme.com',
-          activeStatus: true,
-        },
-        {
-          id: '2',
-          customerCode: 'CUST002',
-          firstName: 'Jane',
-          lastName: 'Smith',
-          company: 'Tech Solutions',
-          email: 'jane.smith@tech.com',
-          activeStatus: false,
-        },
-      ];
+    const customers = customersResponse?.data || [];
+    const total_count = customersResponse?.total_count || 0;
 
-      this._customers.set(customers);
-    }
+    this._customers.set(customers);
+    this._total_count.set(total_count);
+
+    return customersResponse;
   }
 
   addCustomer(newCustomer: Customer) {

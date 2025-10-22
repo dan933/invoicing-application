@@ -11,7 +11,7 @@ public class UserService(AppDbContext _context)
     public async Task<List<UserDto>> GetAllUsers()
     {
         return await _context.Users
-    .Select(u => new UserDto { Id = u.Id, Status = u.Status, Email = u.Email, CreatedAt = u.CreatedAt, Updated = u.Updated })
+    .Select(u => new UserDto { Id = u.Id, Status = u.Status, Email = u.Email, CreatedAt = u.CreatedAt, Updated = u.UpdatedAt })
     .ToListAsync();
     }
 
@@ -50,7 +50,7 @@ public class UserService(AppDbContext _context)
             Status = user.Status,
             Email = user.Email,
             CreatedAt = user.CreatedAt,
-            Updated = user.Updated
+            Updated = user.UpdatedAt
         };
     }
 
@@ -61,13 +61,13 @@ public class UserService(AppDbContext _context)
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
 
         user.PasswordHash = hashedPassword;
-        user.Updated = DateTime.UtcNow;
+        user.UpdatedAt = DateTime.UtcNow;
 
         _context.Users.Update(user);
 
         await _context.SaveChangesAsync();
 
-        return new UserDto { Id = user.Id, Status = user.Status, Email = user.Email, CreatedAt = user.CreatedAt, Updated = user.Updated };
+        return new UserDto { Id = user.Id, Status = user.Status, Email = user.Email, CreatedAt = user.CreatedAt, Updated = user.UpdatedAt };
 
 
     }
