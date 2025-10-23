@@ -55,5 +55,26 @@ public static class CustomerRoutes
             }
 
         }).RequireAuthorization();
+
+
+        endpoints.MapGet("/customers/get/{id}", async (string id, CustomerService service, PermissionService permissionService, ClaimsPrincipal user) =>
+        {
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim, out var userId))
+            {
+                return Results.Unauthorized();
+            }
+
+            var hasAdminPermission = await permissionService.HasPermission(userId, "Admin");
+            if (!hasAdminPermission)
+            {
+                return Results.Forbid();
+            }
+
+
+            var customer = await service.GetCustomer(id);
+            return customer != null ? Results.Ok(customer) : Results.NotFound();
+        }).RequireAuthorization();
     }
 }

@@ -2,9 +2,10 @@
     <h1>Customers</h1>
     <div class="customer-btn-container">
         <app-new-customer (customerCreated)="onCustomerCreate()"></app-new-customer>
-        <mat-slide-toggle style="position: relative; top: 5px;" [(ngModel)]="showInactiveCustomers">
+        <mat-slide-toggle (change)="onToggleChange()" style="position: relative; top: 5px;"
+            [(ngModel)]="showActiveCustomers">
             {{
-            showInactiveCustomers ? "All Customers" : "Active Customers"
+            showActiveCustomers ? "Active Customers" : "Inactive Customers"
             }}</mat-slide-toggle>
     </div>
     <mat-form-field appearance="outline" class="filter-customer">
@@ -12,20 +13,15 @@
         <input matInput placeholder="Ex. Joe" [formControl]="filter">
     </mat-form-field>
     <div class="container mat-elevation-z8">
-        @if (isLoadingResults() || isRateLimitReached()) {
+        @if (isLoadingResults()) {
         <div class="loading-shade">
             @if (isLoadingResults()) {
             <mat-spinner></mat-spinner>
             }
-            @if (isRateLimitReached()) {
-            <div class="rate-limit-reached">
-                API rate limit has been reached. It will be reset in one minute.
-            </div>
-            }
         </div>
         }
 
-        <div class="table-container">
+        <div class="table-container" style="height: 400px; overflow-y: auto;">
             <table mat-table [dataSource]="customerData().items" class="example-table" matSort
                 matSortActive="customerCode" matSortDisableClear matSortDirection="desc">
                 <ng-container matColumnDef="customerCode">
@@ -63,7 +59,6 @@
                     (click)="onCustomerRowClick(row)"></tr>
             </table>
         </div>
-
         <mat-paginator [length]="customerData().total_count" [pageSize]="30"
             aria-label="Select page of GitHub search results"></mat-paginator>
     </div>

@@ -2,6 +2,11 @@
     @if (screenWidth() > 700) {
     <div class="customer-details-grid">
         <div class="item-container span-2">
+            @if(customerLoading()){
+            <mat-spinner style="margin:auto;" diameter="50" strokeWidth="2"></mat-spinner>
+            }
+
+            @if(!customerLoading()){
             <span class="item-header">
                 customer code:
             </span>
@@ -9,8 +14,14 @@
             <span>
                 {{customer?.customerCode}}
             </span>
+            }
         </div>
         <div class="item-container span-3">
+            @if(customerLoading()){
+            <mat-spinner style="margin:auto;" diameter="50" strokeWidth="2"></mat-spinner>
+            }
+
+            @if(!customerLoading()){
             <span class="item-header">
                 Name:
             </span>
@@ -18,9 +29,15 @@
             <span>
                 {{customer?.firstName || ""}} {{customer?.lastName}}
             </span>
+            }
         </div>
         <div class="item-container flex column justify-center align-center"
             style="grid-row: span 2; text-align: center;">
+            @if(customerLoading()){
+            <mat-spinner style="margin:auto;" diameter="50" strokeWidth="2"></mat-spinner>
+            }
+
+            @if(!customerLoading()){
             <span class="item-header">
                 Status:
             </span>
@@ -28,8 +45,14 @@
             <mat-icon [style]="{'color':customer?.activeStatus ? 'green': 'red'}">
                 {{customer?.activeStatus ? 'check_circle' : 'cancel'}}
             </mat-icon>
+            }
         </div>
         <div class="item-container span-2">
+            @if(customerLoading()){
+            <mat-spinner style="margin:auto;" diameter="50" strokeWidth="2"></mat-spinner>
+            }
+
+            @if(!customerLoading()){
             <span class="item-header">
                 Company Name:
             </span>
@@ -37,8 +60,14 @@
             <span>
                 enterprise inc
             </span>
+            }
         </div>
         <div class="item-container span-3">
+            @if(customerLoading()){
+            <mat-spinner style="margin:auto;" diameter="50" strokeWidth="2"></mat-spinner>
+            }
+
+            @if(!customerLoading()){
             <span class="item-header">
                 Email:
             </span>
@@ -46,11 +75,17 @@
             <span>
                 {{customer?.email}}
             </span>
+            }
         </div>
     </div>
     }@else {
     <div style="display: flex; flex-direction: column; gap:5px;">
         <div class="item-container" style="text-align: center;">
+            @if(customerLoading()){
+            <mat-spinner style="margin: auto;" diameter="50" strokeWidth="2"></mat-spinner>
+            }
+
+            @if(!customerLoading()){
             <span class="item-header">
                 customer code:
             </span>
@@ -58,8 +93,14 @@
             <span>
                 {{customer?.customerCode}}
             </span>
+            }
         </div>
         <div class="item-container" style="text-align: center;">
+            @if(customerLoading()){
+            <mat-spinner style="margin: auto;" diameter="50" strokeWidth="2"></mat-spinner>
+            }
+
+            @if(!customerLoading()){
             <span class="item-header">
                 Name:
             </span>
@@ -67,8 +108,15 @@
             <span>
                 {{customer?.firstName || ""}} {{customer?.lastName}}
             </span>
+            }
         </div>
         <div class="item-container span-2" style="text-align: center;">
+            @if(customerLoading()){
+            <mat-spinner style="margin: auto;" diameter="50" strokeWidth="2"></mat-spinner>
+
+            }
+
+            @if(!customerLoading()){
             <span class="item-header">
                 Company Name:
             </span>
@@ -76,8 +124,14 @@
             <span>
                 {{customer?.company}}
             </span>
+            }
         </div>
         <div class="item-container span-3" style="text-align: center;">
+            @if(customerLoading()){
+            <mat-spinner style="margin:auto;" diameter="50" strokeWidth="2"></mat-spinner>
+            }
+
+            @if(!customerLoading()){
             <span class="item-header">
                 Email:
             </span>
@@ -85,8 +139,14 @@
             <span>
                 {{customer?.email}}
             </span>
+            }
         </div>
         <div class="item-container" style="text-align: center;">
+            @if(customerLoading()){
+            <mat-spinner style="margin:auto;" diameter="50" strokeWidth="2"></mat-spinner>
+            }
+
+            @if(!customerLoading()){
             <span class="item-header">
                 Status:
             </span>
@@ -94,6 +154,8 @@
             <mat-icon [style]="{'color':customer?.activeStatus ? 'green': 'red'}">
                 {{customer?.activeStatus ? 'check_circle' : 'cancel'}}
             </mat-icon>
+
+            }
         </div>
     </div>
     }
@@ -112,15 +174,10 @@
     </div>
 
     <div class="container mat-elevation-z8">
-        @if (isLoadingResults || isRateLimitReached) {
+        @if (isLoadingInvoices) {
         <div class="loading-shade">
-            @if (isLoadingResults) {
+            @if (isLoadingInvoices) {
             <mat-spinner></mat-spinner>
-            }
-            @if (isRateLimitReached) {
-            <div class="rate-limit-reached">
-                API rate limit has been reached. It will be reset in one minute.
-            </div>
             }
         </div>
         }

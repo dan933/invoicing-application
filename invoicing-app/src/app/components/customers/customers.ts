@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NewCustomer } from './new-customer/new-customer';
 import { Customer, CustomerService } from '../../services/customers/customer-service';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-customers',
@@ -43,7 +44,7 @@ export class Customers implements AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  showInactiveCustomers = false;
+  showActiveCustomers = true;
 
   resultsLength = 0;
   isLoadingResults = signal(true);
@@ -60,8 +61,29 @@ export class Customers implements AfterViewInit {
 
   customerData = computed(() => ({
     items: this.customerService.customers(),
-    total_count: this.customerService.customers().length,
+    total_count: this.customerService.total_count(),
   }));
+
+  onToggleChange() {
+    this.paginator.pageIndex = 0;
+    this.isLoadingResults.set(true);
+    this.loadCustomers();
+  }
+
+  loadCustomers() {
+    this.customerService
+      .getCustomers(
+        this.sort.active,
+        this.sort.direction,
+        this.paginator.pageIndex,
+        this.paginator.pageSize,
+        this.filter.value,
+        this.showActiveCustomers
+      )
+      .finally(() => {
+        this.isLoadingResults.set(false);
+      });
+  }
 
   ngAfterViewInit() {
     // If the user changes the sort order, reset back to the first page.
@@ -72,36 +94,41 @@ export class Customers implements AfterViewInit {
         this.sort.active,
         this.sort.direction,
         this.paginator.pageIndex,
-        this.paginator.pageSize
+        this.paginator.pageSize,
+        this.filter.value,
+        this.showActiveCustomers
       );
     });
 
-    this.customerService.getCustomers(
-      this.sort.active,
-      this.sort.direction,
-      this.paginator.pageIndex,
-      this.paginator.pageSize
-    );
+    // Listen for page changes
+    this.paginator.page.subscribe(() => {
+      this.customerService.getCustomers(
+        this.sort.active,
+        this.sort.direction,
+        this.paginator.pageIndex,
+        this.paginator.pageSize,
+        this.filter.value,
+        this.showActiveCustomers
+      );
+    });
 
-    this.isLoadingResults.set(false);
+    // Debounced filter changes
+    this.filter.valueChanges.pipe(debounceTime(300)).subscribe(() => {
+      this.paginator.pageIndex = 0;
+      this.isLoadingResults.set(true);
+      this.loadCustomers();
+    });
+
+    this.loadCustomers();
   }
 
   onCustomerCreate() {
     this.isLoadingResults.set(true);
 
-    this.customerService.getCustomers(
-      this.sort.active,
-      this.sort.direction,
-      this.paginator.pageIndex,
-      this.paginator.pageSize
-    );
-
-    this.isLoadingResults.set(false);
+    this.loadCustomers();
   }
 
   onCustomerRowClick(row: any) {
-    console.log(row);
-
     this.router.navigate(['/customers-details', row.id]);
   }
 }

@@ -9,12 +9,6 @@
     padding: 20px;
 }
 
-.customer-btn-container{
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
 .item-container{
     box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
     border: solid var(--secondary) 1px;
@@ -96,4 +90,12 @@ table {
     background-color: var(--primary-dark);
     color: var(--white);
   }
+}
+
+@media screen and (width <= 369px) {
+  .customer-btn-container{
+    flex-direction: column;
+    align-items: center;
+  }
+  
 }

@@ -58,11 +58,11 @@ public class CustomerService(AppDbContext _context)
         if (!string.IsNullOrEmpty(search))
         {
             query = query.Where(c =>
-                c.CustomerCode.Contains(search) ||
-                c.FirstName.Contains(search) ||
-                c.LastName.Contains(search) ||
-                c.Company.Contains(search) ||
-                c.Email.Contains(search));
+               EF.Functions.ILike(c.CustomerCode, $"%{search}%") ||
+               EF.Functions.ILike(c.FirstName, $"%{search}%") ||
+               EF.Functions.ILike(c.LastName, $"%{search}%") ||
+               EF.Functions.ILike(c.Company, $"%{search}%") ||
+               EF.Functions.ILike(c.Email, $"%{search}%"));
         }
 
         if (activeStatus.HasValue)

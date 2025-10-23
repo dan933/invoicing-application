@@ -40,7 +40,9 @@ export class CustomerService {
     sort: string,
     order: SortDirection,
     page: number,
-    pageSize: number
+    pageSize: number,
+    filter?: string | null,
+    showActiveCustomers?: boolean | null
   ): Promise<{
     items: Customer[];
     total_count: number;
@@ -50,10 +52,14 @@ export class CustomerService {
       sortDirection: order,
       page: page + 1,
       pageSize,
+      ...(filter && {
+        search: filter,
+      }),
+      activeStatus: showActiveCustomers,
     });
 
     const customers = customersResponse?.data || [];
-    const total_count = customersResponse?.total_count || 0;
+    const total_count = customersResponse?.pagination?.totalPages || 0;
 
     this._customers.set(customers);
     this._total_count.set(total_count);
@@ -65,8 +71,11 @@ export class CustomerService {
     this._customers.update((customers) => [...customers, newCustomer]);
   }
 
-  getCustomerById(id: string) {
-    return this.customers().find((customer) => customer.id === id) || null;
+  async getCustomerById(id: string): Promise<Customer> {
+    return await this.api.Get(`${environment.apiUrl}/customers/get/${id}`).catch((error) => {
+      console.log(error);
+      return null;
+    });
   }
 
   editCustomer(customer: Customer) {

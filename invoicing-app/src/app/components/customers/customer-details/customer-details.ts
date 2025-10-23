@@ -64,8 +64,8 @@ export class CustomerDetails implements AfterViewInit {
   displayedColumns: string[] = ['invoiceNumber', 'date', 'subTotal', 'paid', 'gst'];
 
   resultsLength = 0;
-  isLoadingResults = true;
-  isRateLimitReached = false;
+  isLoadingInvoices = true;
+  customerLoading = signal(true);
 
   constructor() {
     this.getCustomer();
@@ -82,15 +82,14 @@ export class CustomerDetails implements AfterViewInit {
         .pipe(
           startWith({}),
           switchMap((): Observable<InvoiceApi | null> => {
-            this.isLoadingResults = true;
+            this.isLoadingInvoices = true;
             return this.invoiceService
               .getInvoices(this.sort.active, this.sort.direction, this.paginator.pageIndex)
               .pipe(catchError(() => observableOf(null)));
           }),
           map((data) => {
             // Flip flag to show that loading has finished.
-            this.isLoadingResults = false;
-            this.isRateLimitReached = data === null;
+            this.isLoadingInvoices = false;
 
             if (data === null) {
               return [];
@@ -107,11 +106,15 @@ export class CustomerDetails implements AfterViewInit {
     });
   }
 
-  getCustomer() {
+  async getCustomer() {
+    this.customerLoading.set(true);
+
     const customerId = this.route.snapshot.paramMap.get('id');
     if (customerId) {
-      this.customer = this.customerService.getCustomerById(customerId);
+      this.customer = await this.customerService.getCustomerById(customerId);
     }
+
+    this.customerLoading.set(false);
   }
 
   onInvoiceRowClick(invoiceId: string) {
