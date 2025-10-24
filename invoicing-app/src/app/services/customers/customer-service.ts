@@ -87,10 +87,10 @@ export class CustomerService {
     });
   }
 
-  editCustomer(customer: Customer) {
-    this._customers.update((customers) =>
-      customers.map((c) => (c.id === customer.id ? customer : c))
-    );
+  async editCustomer(customer: Customer) {
+    return await this.api.Post(`${environment.apiUrl}/customers/update/${customer.id}`, {
+      ...customer,
+    });
   }
 
   async DeleteCustomer(customerId: string) {
