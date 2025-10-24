@@ -88,8 +88,14 @@ export class DialogCustomer {
   utils = inject(Utils);
   readonly data = inject<Customer>(MAT_DIALOG_DATA);
 
-  readonly customer = signal<Customer>({
-    id: '',
+  readonly customer = signal<{
+    customerCode: string;
+    firstName: string;
+    lastName: string;
+    company: string;
+    email: string;
+    activeStatus: boolean;
+  }>({
     customerCode: '',
     firstName: '',
     lastName: '',
@@ -120,7 +126,9 @@ export class DialogCustomer {
 
     this.loading.set(true);
 
-    this.customerService.addCustomer({ ...this.customer(), id: crypto.randomUUID() });
+    const addCustomerResponse = await this.customerService.addCustomer({ ...this.customer() });
+
+    console.log('addCustomerResponse', addCustomerResponse);
 
     this.dialogRef.close({ success: true, customer: this.customer() });
 

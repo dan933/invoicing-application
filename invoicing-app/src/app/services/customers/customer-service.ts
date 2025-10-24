@@ -67,8 +67,17 @@ export class CustomerService {
     return customersResponse;
   }
 
-  addCustomer(newCustomer: Customer) {
-    this._customers.update((customers) => [...customers, newCustomer]);
+  async addCustomer(newCustomer: {
+    customerCode: string;
+    firstName: string;
+    lastName: string;
+    company: string;
+    email: string;
+    activeStatus: boolean;
+  }) {
+    return await this.api.Post(`${environment.apiUrl}/customers/create`, {
+      ...newCustomer,
+    });
   }
 
   async getCustomerById(id: string): Promise<Customer> {
@@ -84,7 +93,9 @@ export class CustomerService {
     );
   }
 
-  DeleteCustomer(customerCode: string) {
-    this._customers.update((customers) => customers.filter((c) => c.customerCode !== customerCode));
+  async DeleteCustomer(customerId: string) {
+    await this.api.Delete(`${environment.apiUrl}/customers/delete/${customerId}`);
+
+    this._customers.update((customers) => customers.filter((c) => c.id !== customerId));
   }
 }

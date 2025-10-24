@@ -24,10 +24,10 @@ import { Router } from '@angular/router';
 })
 export class DeleteCustomer {
   readonly dialog = inject(MatDialog);
-  @Input() customerCode: string = '';
+  @Input() customerId: string = '';
 
   openDialog(): void {
-    this.dialog.open(DialogCustomer, { data: this.customerCode });
+    this.dialog.open(DialogCustomer, { data: this.customerId });
   }
 }
 

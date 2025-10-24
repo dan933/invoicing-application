@@ -72,4 +72,33 @@ export class Api {
 
     return response;
   }
+
+  async Delete(url: string) {
+    const token = this.auth.getToken();
+    if (!token) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).then((res) => {
+      if (res.status === 401 || res.status === 403) {
+        //remove token
+        this.auth.removeToken();
+        this.router.navigate(['/login']);
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      return res.json();
+    });
+
+    return response;
+  }
 }

@@ -32,6 +32,7 @@ public class CustomerService(AppDbContext _context)
         try
         {
             await _context.SaveChangesAsync();
+
             return customer;
         }
         catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("customers_customer_code_key") == true)
@@ -40,6 +41,49 @@ public class CustomerService(AppDbContext _context)
         }
     }
 
+
+    public async Task<AppDbContext.Customer> UpdateCustomer(string id, SetCustomerRequest customerRequest)
+    {
+        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Id == id) ?? throw new KeyNotFoundException("Customer not found");
+
+        customer.CustomerCode = customerRequest.CustomerCode;
+        customer.FirstName = customerRequest.FirstName;
+        customer.LastName = customerRequest.LastName;
+        customer.Company = customerRequest.Company;
+        customer.Email = customerRequest.Email;
+        customer.ActiveStatus = customerRequest.ActiveStatus;
+        customer.UpdatedAt = DateTime.UtcNow;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+            return customer;
+        }
+        catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("customers_customer_code_key") == true)
+        {
+            throw new InvalidOperationException($"Customer code '{customerRequest.CustomerCode}' already exists.");
+        }
+    }
+
+
+    public async Task<AppDbContext.Customer> DeleteCustomer(string id)
+    {
+        var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Id == id) ?? throw new KeyNotFoundException("Customer not found");
+
+        try
+        {
+
+            customer.Status = "Deleted";
+            customer.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return customer;
+        }
+        catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("customers_customer_code_key") == true)
+        {
+            throw new InvalidOperationException($"Customer code '{customer.CustomerCode}' already exists.");
+        }
+    }
 
     public async Task<PaginatedCustomerResponse> ListCustomers(ListCustomerRequest listCustomerRequest)
     {

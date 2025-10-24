@@ -96,7 +96,7 @@ export class DialogCustomer {
 
   readonly customer = signal<Customer>({
     id: this.data?.id || '',
-    customerCode: this.data?.customerCode || '',
+    customerCode: this.data?.customerCode?.toUpperCase() || '',
     firstName: this.data?.firstName || '',
     lastName: this.data?.lastName || '',
     company: this.data?.company || '',

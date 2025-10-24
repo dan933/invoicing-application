@@ -168,7 +168,7 @@
                 </span>
             </button>
             <app-edit-customer [customerProp]="customer" (onCustomerEdit)="onCustomerEdit()"></app-edit-customer>
-            <app-delete-customer [customerCode]="customer?.customerCode || ''"></app-delete-customer>
+            <app-delete-customer [customerId]="customer?.id || ''"></app-delete-customer>
         </div>
 
     </div>
