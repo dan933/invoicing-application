@@ -10,12 +10,12 @@ public record SetPermissionRequest(Guid UserId, string PermissionName);
 public class PermissionService(AppDbContext _context)
 {
 
-    public async Task<List<AppDbContext.Permission>> GetAllPermissions()
+    public async Task<List<Permission>> GetAllPermissions()
     {
         return await _context.Permissions.ToListAsync();
     }
 
-    public async Task<AppDbContext.Permission> SetPermission(Guid userId, string permissionName)
+    public async Task<Permission> SetPermission(Guid userId, string permissionName)
     {
 
         //Check user exists
@@ -29,7 +29,7 @@ public class PermissionService(AppDbContext _context)
         }
 
 
-        var permission = new AppDbContext.Permission
+        var permission = new Permission
         {
             PermissionName = permissionName,
             UserId = userId

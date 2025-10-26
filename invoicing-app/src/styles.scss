@@ -218,6 +218,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     border-radius: 4px;
     cursor: not-allowed;
     font-size: 1rem;
+
+    &:hover{
+      background: #787878;
+    }
 }
 
 

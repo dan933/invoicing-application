@@ -126,7 +126,15 @@ export class DialogCustomer {
 
     this.loading.set(true);
 
-    const addCustomerResponse = await this.customerService.addCustomer({ ...this.customer() });
+    const addCustomerResponse = await this.customerService
+      .addCustomer({ ...this.customer() })
+      .catch((error) => {
+        this.formErrorMessage.set(error.message || 'Something went wrong. Please try again.');
+        this.loading.set(false);
+        return null;
+      });
+
+    if (!addCustomerResponse) return;
 
     console.log('addCustomerResponse', addCustomerResponse);
 

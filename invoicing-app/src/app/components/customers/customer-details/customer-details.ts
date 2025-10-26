@@ -58,52 +58,18 @@ export class CustomerDetails implements AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   invoiceData!: HttpDatabase | null;
-  data: Invoice[] = [];
+  invoices: Invoice[] = [];
   customer: Customer | null = null;
 
   displayedColumns: string[] = ['invoiceNumber', 'date', 'subTotal', 'paid', 'gst'];
 
   resultsLength = 0;
-  isLoadingInvoices = true;
+  isLoadingInvoices = signal(true);
   customerLoading = signal(true);
 
-  constructor() {
-    this.getCustomer();
-  }
-
   ngAfterViewInit() {
-    this.invoiceData = new HttpDatabase(this._httpClient);
-
-    // If the user changes the sort order, reset back to the first page.
-    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
-
-    setTimeout(() => {
-      merge(this.sort.sortChange, this.paginator.page)
-        .pipe(
-          startWith({}),
-          switchMap((): Observable<InvoiceApi | null> => {
-            this.isLoadingInvoices = true;
-            return this.invoiceService
-              .getInvoices(this.sort.active, this.sort.direction, this.paginator.pageIndex)
-              .pipe(catchError(() => observableOf(null)));
-          }),
-          map((data) => {
-            // Flip flag to show that loading has finished.
-            this.isLoadingInvoices = false;
-
-            if (data === null) {
-              return [];
-            }
-
-            // Only refresh the result length if there is new data. In case of rate
-            // limit errors, we do not want to reset the paginator to zero, as that
-            // would prevent users from re-triggering requests.
-            this.resultsLength = data.total_count;
-            return data.items;
-          })
-        )
-        .subscribe((data) => (this.data = data));
-    });
+    this.getCustomer();
+    this.isLoadingInvoices.set(false);
   }
 
   async getCustomer() {
@@ -127,7 +93,7 @@ export class CustomerDetails implements AfterViewInit {
   }
 
   onNewInvoiceClick() {
-    this.router.navigate(['/invoices/new']);
+    this.router.navigate(['/invoices', this.customer?.id, 'new']);
   }
 
   @HostListener('window:resize', ['$event'])

@@ -67,6 +67,26 @@ export class CustomerService {
     return customersResponse;
   }
 
+  async searchCustomers(
+    filter?: string | null,
+    showActiveCustomers?: boolean | null
+  ): Promise<Customer[]> {
+    const customersResponse = await this.api.Post(`${environment.apiUrl}/customers/list`, {
+      sortColumn: 'customerCode',
+      sortDirection: 'desc',
+      page: 1,
+      pageSize: 30,
+      ...(filter && {
+        search: filter,
+      }),
+      activeStatus: showActiveCustomers,
+    });
+
+    const customers = customersResponse?.data || [];
+
+    return customers;
+  }
+
   async addCustomer(newCustomer: {
     customerCode: string;
     firstName: string;

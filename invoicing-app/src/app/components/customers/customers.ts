@@ -88,28 +88,16 @@ export class Customers implements AfterViewInit {
   ngAfterViewInit() {
     // If the user changes the sort order, reset back to the first page.
     this.sort.sortChange.subscribe(() => {
+      this.isLoadingResults.set(true);
       this.paginator.pageIndex = 0;
 
-      this.customerService.getCustomers(
-        this.sort.active,
-        this.sort.direction,
-        this.paginator.pageIndex,
-        this.paginator.pageSize,
-        this.filter.value,
-        this.showActiveCustomers
-      );
+      this.loadCustomers();
     });
 
     // Listen for page changes
     this.paginator.page.subscribe(() => {
-      this.customerService.getCustomers(
-        this.sort.active,
-        this.sort.direction,
-        this.paginator.pageIndex,
-        this.paginator.pageSize,
-        this.filter.value,
-        this.showActiveCustomers
-      );
+      this.isLoadingResults.set(true);
+      this.loadCustomers();
     });
 
     // Debounced filter changes

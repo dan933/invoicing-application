@@ -35,7 +35,7 @@ public class UserService(AppDbContext _context)
         if (existingUser != null)
             throw new InvalidOperationException("Email already exists");
 
-        var user = new AppDbContext.User
+        var user = new User
         {
             Email = email,
             PasswordHash = hashedPassword

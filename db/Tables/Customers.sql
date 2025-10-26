@@ -1,5 +1,7 @@
+DROP TABLE IF EXISTS customers;
+
 CREATE TABLE customers (
-    id VARCHAR PRIMARY KEY,
+    id UUID PRIMARY KEY,
     status VARCHAR NOT NULL,
     customer_code VARCHAR NOT NULL,
     first_name VARCHAR,
@@ -13,3 +15,6 @@ CREATE TABLE customers (
 
 CREATE UNIQUE INDEX customers_customer_code_active_unique 
 ON customers (customer_code) WHERE status = 'Active';
+
+
+SELECT * FROM users;

@@ -4,17 +4,14 @@ using api.models;
 
 namespace api.services;
 
-public record SetCustomerRequest(string CustomerCode, string FirstName, string LastName, string Company, string Email, bool ActiveStatus);
 
-public record ListCustomerRequest(int Page, int PageSize, string SortColumn, string SortDirection, string? Search = null, bool? ActiveStatus = true);
-
-public record PaginatedCustomerResponse(List<AppDbContext.Customer> Data, Pagination Pagination);
+public record PaginatedCustomerResponse(List<Customer> Data, Pagination Pagination);
 
 public class CustomerService(AppDbContext _context)
 {
-    public async Task<AppDbContext.Customer> CreateCustomer(SetCustomerRequest customerRequest)
+    public async Task<Customer> CreateCustomer(SetCustomerRequest customerRequest)
     {
-        var customer = new AppDbContext.Customer
+        var customer = new Customer
         {
             CustomerCode = customerRequest.CustomerCode,
             FirstName = customerRequest.FirstName,
@@ -42,7 +39,7 @@ public class CustomerService(AppDbContext _context)
     }
 
 
-    public async Task<AppDbContext.Customer> UpdateCustomer(string id, SetCustomerRequest customerRequest)
+    public async Task<Customer> UpdateCustomer(Guid id, SetCustomerRequest customerRequest)
     {
         var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Id == id) ?? throw new KeyNotFoundException("Customer not found");
 
@@ -66,7 +63,7 @@ public class CustomerService(AppDbContext _context)
     }
 
 
-    public async Task<AppDbContext.Customer> DeleteCustomer(string id)
+    public async Task<Customer> DeleteCustomer(Guid id)
     {
         var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Id == id) ?? throw new KeyNotFoundException("Customer not found");
 
@@ -85,7 +82,7 @@ public class CustomerService(AppDbContext _context)
         }
     }
 
-    public async Task<PaginatedCustomerResponse> ListCustomers(ListCustomerRequest listCustomerRequest)
+    public async Task<PaginatedCustomerResponse> ListCustomers(PagedRequest listCustomerRequest)
     {
 
         var search = listCustomerRequest.Search;
@@ -119,7 +116,7 @@ public class CustomerService(AppDbContext _context)
 
             var pascalCaseSortColumn = char.ToUpper(sortColumn[0]) + sortColumn[1..].ToLower();
 
-            var property = typeof(AppDbContext.Customer).GetProperty(pascalCaseSortColumn,
+            var property = typeof(Customer).GetProperty(pascalCaseSortColumn,
                 System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
 
             if (property != null)
@@ -149,7 +146,7 @@ public class CustomerService(AppDbContext _context)
     }
 
 
-    public async Task<AppDbContext.Customer?> GetCustomer(string id)
+    public async Task<Customer?> GetCustomer(Guid id)
     {
         return await _context.Customers.FirstOrDefaultAsync(c => c.Id == id);
     }

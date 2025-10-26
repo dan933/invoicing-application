@@ -2,13 +2,14 @@ namespace api.routes;
 
 using System.Security.Claims;
 using api.services;
+using api.models;
 
 public static class CustomerRoutes
 {
 
     public static void MapCustomerEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapPost("/customers/list", async (ListCustomerRequest request, CustomerService service, PermissionService permissionService, ClaimsPrincipal user) =>
+        endpoints.MapPost("/customers/list", async (PagedRequest request, CustomerService service, PermissionService permissionService, ClaimsPrincipal user) =>
         {
 
             var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -56,7 +57,7 @@ public static class CustomerRoutes
 
         }).RequireAuthorization();
 
-        endpoints.MapPost("/customers/update/{id}", async (string id, SetCustomerRequest request, CustomerService service, PermissionService permissionService, ClaimsPrincipal user) =>
+        endpoints.MapPost("/customers/update/{id}", async (Guid id, SetCustomerRequest request, CustomerService service, PermissionService permissionService, ClaimsPrincipal user) =>
                 {
 
                     var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -83,7 +84,7 @@ public static class CustomerRoutes
 
                 }).RequireAuthorization();
 
-        endpoints.MapDelete("/customers/delete/{id}", async (string id, CustomerService service, PermissionService permissionService, ClaimsPrincipal user) =>
+        endpoints.MapDelete("/customers/delete/{id}", async (Guid id, CustomerService service, PermissionService permissionService, ClaimsPrincipal user) =>
         {
             var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -110,7 +111,7 @@ public static class CustomerRoutes
 
         }).RequireAuthorization();
 
-        endpoints.MapGet("/customers/get/{id}", async (string id, CustomerService service, PermissionService permissionService, ClaimsPrincipal user) =>
+        endpoints.MapGet("/customers/get/{id}", async (Guid id, CustomerService service, PermissionService permissionService, ClaimsPrincipal user) =>
         {
             var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
