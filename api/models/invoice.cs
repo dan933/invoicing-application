@@ -40,5 +40,5 @@ public class SetInvoiceRequest
     public DateTime InvoiceDate { get; set; } = DateTime.UtcNow;
     public DateTime DueDate { get; set; } = DateTime.UtcNow;
 
-    public List<InvoiceItemDto> Items { get; set; } = [];
+    public List<InvoiceItemDto> LineItems { get; set; } = [];
 }

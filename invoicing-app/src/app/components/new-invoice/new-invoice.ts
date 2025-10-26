@@ -61,10 +61,6 @@ export class NewInvoice implements OnInit {
   invoice = this.fb.group({
     invoiceDate: [new Date(), Validators.required],
     dueDate: [new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), Validators.required],
-    customerCode: ['', Validators.required],
-    customerName: ['', Validators.required],
-    companyName: ['', Validators.required],
-    email: ['', Validators.required],
     invoiceReference: ['', Validators.required],
     subTotal: [0, Validators.required],
     gst: [false],
@@ -85,6 +81,19 @@ export class NewInvoice implements OnInit {
       }),
     ]),
   });
+
+  constructor() {
+    this.getCustomer();
+  }
+  ngOnInit(): void {
+    this.customerFilterOptions = this.selectedCustomer.valueChanges.pipe(
+      startWith(''),
+      switchMap((value) => {
+        const searchTerm = typeof value === 'string' ? value : value?.customerCode || '';
+        return this.customerService.searchCustomers(searchTerm);
+      })
+    );
+  }
 
   customerCodeDisplayFn(value: Customer) {
     return value?.customerCode || '';
@@ -125,17 +134,8 @@ export class NewInvoice implements OnInit {
     );
   }
 
-  constructor() {
-    this.getCustomer();
-  }
-  ngOnInit(): void {
-    this.customerFilterOptions = this.selectedCustomer.valueChanges.pipe(
-      startWith(''),
-      switchMap((value) => {
-        const searchTerm = typeof value === 'string' ? value : value?.customerCode || '';
-        return this.customerService.searchCustomers(searchTerm);
-      })
-    );
+  createInvoice() {
+    console.log(this.invoice.value);
   }
 
   @HostListener('window:resize', ['$event'])

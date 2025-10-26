@@ -22,7 +22,7 @@ public class InvoiceService(AppDbContext _context)
 
         _context.Invoices.Add(invoice);
 
-        foreach (var item in invoiceRequest.Items)
+        foreach (var item in invoiceRequest.LineItems)
         {
             var invoiceItem = new InvoiceItem
             {

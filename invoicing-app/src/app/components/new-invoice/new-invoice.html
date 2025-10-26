@@ -135,8 +135,8 @@
             <span class="item-header">
                 GST
             </span>
-            <mat-icon [style]="{'color':invoice.value.paid ? 'green': 'red'}">
-                {{invoice.value.paid ? 'check_circle' : 'cancel'}}
+            <mat-icon [style]="{'color':invoice.value.gst ? 'green': 'red'}">
+                {{invoice.value.gst ? 'check_circle' : 'cancel'}}
             </mat-icon>
         </div>
 
@@ -159,14 +159,18 @@
             <mat-datepicker-toggle matIconSuffix [for]="pickerDueDate"></mat-datepicker-toggle>
             <mat-datepicker #pickerDueDate></mat-datepicker>
         </mat-form-field>
-        <br>
-        <mat-slide-toggle [checked]="invoice.value.gst" style="position: relative; top: 10px;">
-            {{
-            invoice.value.gst ? "GST" : "No GST"
-            }}</mat-slide-toggle>
+    </div>
+    <div class="flex column gap-5">
+        <mat-slide-toggle [formControl]="invoice.controls.gst">
+        </mat-slide-toggle>
+        <span>{{invoice.value.gst ? "GST" : "No GST"}}</span>
+    </div>
+    <div class="flex column  gap-5">
+        <mat-slide-toggle [formControl]="invoice.controls.paid">
+        </mat-slide-toggle>
+        <span>{{invoice.value.paid ? "Paid" : "Unpaid"}}</span>
     </div>
 
-    <!-- Line Items Section -->
     <div class="line-items-section">
         <h2>Line Items</h2>
         @for (item of invoice.controls.lineItems.controls; track $index) {
@@ -211,7 +215,7 @@
     </div>
     <div class="save-section">
         <button style="position: relative; margin-bottom: 2rem;" mat-raised-button color="primary"
-            [class]="`btn ${!selectedCustomer.value ? 'btn-disabled' : ''}`">
+            [class]="`btn ${!selectedCustomer.value ? 'btn-disabled' : ''}`" (click)="createInvoice()">
             <mat-icon>save</mat-icon>
             <span style="position: relative; bottom: 6px;">
                 Save Invoice
