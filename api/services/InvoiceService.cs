@@ -7,7 +7,10 @@ namespace api.services;
 public class InvoiceService(AppDbContext _context)
 {
 
-    public async Task<Invoice> CreateInvoice(SetInvoiceRequest invoiceRequest)
+    public record InvoiceWithItems(Invoice Invoice, List<InvoiceItem> InvoiceItems);
+
+
+    public async Task<InvoiceWithItems> CreateInvoice(SetInvoiceRequest invoiceRequest)
     {
         var invoice = new Invoice
         {
@@ -21,6 +24,8 @@ public class InvoiceService(AppDbContext _context)
         };
 
         _context.Invoices.Add(invoice);
+
+        var invoiceItems = new List<InvoiceItem>();
 
         foreach (var item in invoiceRequest.LineItems)
         {
@@ -36,6 +41,8 @@ public class InvoiceService(AppDbContext _context)
             };
 
             _context.InvoiceItems.Add(invoiceItem);
+
+            invoiceItems.Add(invoiceItem);
         }
 
         try
@@ -48,7 +55,7 @@ public class InvoiceService(AppDbContext _context)
         }
 
 
-        return invoice;
+        return new InvoiceWithItems(invoice, invoiceItems);
     }
 
 }

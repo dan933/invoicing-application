@@ -1,4 +1,12 @@
-import { Component, HostListener, inject, signal, LOCALE_ID, OnInit } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  inject,
+  signal,
+  LOCALE_ID,
+  OnInit,
+  computed,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   Invoice,
@@ -70,14 +78,12 @@ export class NewInvoice implements OnInit {
         description: FormControl<string | null>;
         quantity: FormControl<number | null>;
         unitPrice: FormControl<number | null>;
-        total: FormControl<number | null>;
       }>
     >([
       this.fb.group({
-        description: this.fb.control(''),
-        quantity: this.fb.control(0),
-        unitPrice: this.fb.control(0),
-        total: this.fb.control(0),
+        description: this.fb.control('', Validators.required),
+        quantity: this.fb.control(0, [Validators.required, Validators.min(1)]),
+        unitPrice: this.fb.control(0, [Validators.required, Validators.min(0.01)]),
       }),
     ]),
   });
@@ -85,6 +91,7 @@ export class NewInvoice implements OnInit {
   constructor() {
     this.getCustomer();
   }
+
   ngOnInit(): void {
     this.customerFilterOptions = this.selectedCustomer.valueChanges.pipe(
       startWith(''),
@@ -114,7 +121,6 @@ export class NewInvoice implements OnInit {
       description: FormControl<string | null>;
       quantity: FormControl<number | null>;
       unitPrice: FormControl<number | null>;
-      total: FormControl<number | null>;
     }>
   ) {
     const index = this.invoice.controls.lineItems.controls.indexOf(item);
@@ -126,16 +132,58 @@ export class NewInvoice implements OnInit {
   addLineItem() {
     this.invoice.controls.lineItems.push(
       this.fb.group({
-        description: this.fb.control(''),
-        quantity: this.fb.control(0),
-        unitPrice: this.fb.control(0),
-        total: this.fb.control(0),
+        description: this.fb.control('', Validators.required),
+        quantity: this.fb.control(0, [Validators.required, Validators.min(1)]),
+        unitPrice: this.fb.control(0, [Validators.required, Validators.min(0.01)]),
       })
     );
   }
 
+  get isValidForm() {
+    const validInvoice = this.invoice.valid && this.selectedCustomer.value !== null;
+    const validLineItems = this.invoice.controls.lineItems.controls.every((lineItem) => {
+      return lineItem.valid;
+    });
+    const validDates = this.invoice.value.dueDate! > this.invoice.value.invoiceDate!;
+
+    return validInvoice && validLineItems && validDates;
+  }
+
+  get subTotal() {
+    return this.invoice.controls.lineItems.controls.reduce((acc, lineItem) => {
+      return acc + (lineItem.value.unitPrice || 0) * (lineItem.value.quantity || 0);
+    }, 0);
+  }
+
+  get gst() {
+    return this.invoice.value.gst ? this.subTotal * 0.1 : 0;
+  }
+
+  get total() {
+    return this.subTotal + this.gst;
+  }
+
   createInvoice() {
+    if (!this.isValidForm || !this.selectedCustomer.value?.id) return;
     console.log(this.invoice.value);
+
+    const payload = {
+      customerId: this.selectedCustomer.value.id,
+      invoiceReferenceNumber: this.invoice.value.invoiceReference?.toUpperCase(),
+      invoiceDate: this.invoice.value.invoiceDate,
+      dueDate: this.invoice.value.dueDate,
+      paid: this.invoice.value.paid,
+      gst: this.invoice.value.gst,
+      lineItems: this.invoice.value.lineItems?.map((item) => {
+        return {
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+        };
+      }),
+    };
+
+    console.log('payload', payload);
   }
 
   @HostListener('window:resize', ['$event'])

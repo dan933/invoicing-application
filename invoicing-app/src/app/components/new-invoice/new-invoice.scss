@@ -36,12 +36,22 @@
         font-weight: bold;
     }
 }
+
+.invoice-reference-section {
+    position: relative;
+    display: flex;
+    column-gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 2rem;    
+    mat-form-field {
+        width: 300px;
+    }
+}
 .invoice-input-section {
     position: relative;
     display: flex;
     column-gap: 15px;
     flex-wrap: wrap;
-    margin-top: 2rem;
     
     mat-form-field {
         width: 300px;
@@ -137,6 +147,49 @@
         align-items: stretch;
     }
 }
+
+.totals-section {
+  margin: 2rem 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.totals-container {
+  min-width: 300px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  background: #f9f9f9;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e0e0e0;
+  
+  &:nth-child(2) {
+    border-bottom: none;
+  }
+  
+  &.final-total {
+    font-weight: bold;
+    font-size: 1.1em;
+    border-top: 2px solid #333;
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+  }
+}
+
+.total-label {
+  font-weight: 500;
+}
+
+.total-value {
+  font-weight: 600;
+  color: #2e7d32;
+}
+
 
 .save-section {
     margin: 2rem 0;
