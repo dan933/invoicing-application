@@ -7,7 +7,7 @@ import {
   OnInit,
   computed,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   Invoice,
   InvoiceService,
@@ -33,6 +33,9 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { Customer, CustomerService } from '../../services/customers/customer-service';
 import { map, Observable, startWith, switchMap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { SnackbarService } from '../../services/snackbar/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 @Component({
   selector: 'app-invoice-details',
   imports: [
@@ -47,16 +50,20 @@ import { AsyncPipe } from '@angular/common';
     MatAutocompleteModule,
     AsyncPipe,
     MatSlideToggleModule,
+    MatProgressSpinner,
   ],
   providers: [provideNativeDateAdapter(), { provide: LOCALE_ID, useValue: 'en-GB' }],
   templateUrl: './new-invoice.html',
   styleUrl: './new-invoice.scss',
 })
 export class NewInvoice implements OnInit {
+  loading = signal(false);
   screenWidth = signal(window.innerWidth);
 
   route = inject(ActivatedRoute);
+  router = inject(Router);
 
+  snackbar = inject(SnackbarService);
   invoiceService = inject(InvoiceService);
   customerService = inject(CustomerService);
 
@@ -69,7 +76,6 @@ export class NewInvoice implements OnInit {
   invoice = this.fb.group({
     invoiceDate: [new Date(), Validators.required],
     dueDate: [new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), Validators.required],
-    invoiceReference: ['', Validators.required],
     subTotal: [0, Validators.required],
     gst: [false],
     paid: [false],
@@ -82,8 +88,16 @@ export class NewInvoice implements OnInit {
     >([
       this.fb.group({
         description: this.fb.control('', Validators.required),
-        quantity: this.fb.control(0, [Validators.required, Validators.min(1)]),
-        unitPrice: this.fb.control(0, [Validators.required, Validators.min(0.01)]),
+        quantity: this.fb.control(0, [
+          Validators.required,
+          Validators.min(1),
+          this.wholeNumberValidator,
+        ]),
+        unitPrice: this.fb.control(0, [
+          Validators.required,
+          Validators.min(0.01),
+          this.maxDecimalPlacesValidator(2),
+        ]),
       }),
     ]),
   });
@@ -108,9 +122,15 @@ export class NewInvoice implements OnInit {
 
   async getCustomer() {
     if (this.customerId) {
-      const customer = await this.customerService.getCustomerById(this.customerId).catch((err) => {
-        return null;
-      });
+      this.loading.set(true);
+      const customer = await this.customerService
+        .getCustomerById(this.customerId)
+        .catch((err) => {
+          return null;
+        })
+        .finally(() => {
+          this.loading.set(false);
+        });
 
       this.selectedCustomer.setValue(customer);
     }
@@ -133,8 +153,16 @@ export class NewInvoice implements OnInit {
     this.invoice.controls.lineItems.push(
       this.fb.group({
         description: this.fb.control('', Validators.required),
-        quantity: this.fb.control(0, [Validators.required, Validators.min(1)]),
-        unitPrice: this.fb.control(0, [Validators.required, Validators.min(0.01)]),
+        quantity: this.fb.control(0, [
+          Validators.required,
+          Validators.min(1),
+          this.wholeNumberValidator,
+        ]),
+        unitPrice: this.fb.control(0, [
+          Validators.required,
+          Validators.min(0.01),
+          this.maxDecimalPlacesValidator(2),
+        ]),
       })
     );
   }
@@ -163,13 +191,32 @@ export class NewInvoice implements OnInit {
     return this.subTotal + this.gst;
   }
 
-  createInvoice() {
+  wholeNumberValidator(control: any) {
+    const value = control.value;
+    if (value !== null && value % 1 !== 0) {
+      return { notWholeNumber: true };
+    }
+    return null;
+  }
+
+  maxDecimalPlacesValidator(maxDecimals: number) {
+    return (control: any) => {
+      const value = control.value;
+      if (value !== null) {
+        const decimalPlaces = (value.toString().split('.')[1] || '').length;
+        if (decimalPlaces > maxDecimals) {
+          return { tooManyDecimals: true };
+        }
+      }
+      return null;
+    };
+  }
+
+  async createInvoice() {
     if (!this.isValidForm || !this.selectedCustomer.value?.id) return;
-    console.log(this.invoice.value);
 
     const payload = {
       customerId: this.selectedCustomer.value.id,
-      invoiceReferenceNumber: this.invoice.value.invoiceReference?.toUpperCase(),
       invoiceDate: this.invoice.value.invoiceDate,
       dueDate: this.invoice.value.dueDate,
       paid: this.invoice.value.paid,
@@ -178,12 +225,28 @@ export class NewInvoice implements OnInit {
         return {
           description: item.description,
           quantity: item.quantity,
-          unitPrice: item.unitPrice,
+          unitPrice: item.unitPrice! * 100,
+          totalPrice: item.unitPrice! * 100 * item.quantity!,
         };
       }),
     };
 
-    console.log('payload', payload);
+    this.loading.set(true);
+
+    const createInvoiceResponse = await this.invoiceService
+      .createInvoice(payload)
+      .catch((err) => {})
+      .finally(() => {
+        this.loading.set(false);
+      });
+
+    if (createInvoiceResponse?.invoice?.id) {
+      this.snackbar.success('Invoice created successfully!');
+      this.router.navigate(['/customers-details', this.selectedCustomer.value.id]);
+      return;
+    }
+
+    this.snackbar.error('Failed to create invoice');
   }
 
   @HostListener('window:resize', ['$event'])

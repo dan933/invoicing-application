@@ -46,6 +46,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<PermissionService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CustomerService>();
+builder.Services.AddScoped<InvoiceService>();
 
 
 var app = builder.Build();
@@ -64,6 +65,7 @@ app.UseHttpsRedirection();
 app.MapUserEndpoints();
 app.MapAuthEndpoints();
 app.MapCustomerEndpoints();
+app.MapInvoiceEndpoints();
 
 app.Run();
 

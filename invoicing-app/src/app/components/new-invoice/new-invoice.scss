@@ -37,22 +37,12 @@
     }
 }
 
-.invoice-reference-section {
-    position: relative;
-    display: flex;
-    column-gap: 15px;
-    flex-wrap: wrap;
-    margin-top: 2rem;    
-    mat-form-field {
-        width: 300px;
-    }
-}
 .invoice-input-section {
     position: relative;
     display: flex;
     column-gap: 15px;
     flex-wrap: wrap;
-    
+    margin-top: 2rem;    
     mat-form-field {
         width: 300px;
     }
@@ -151,7 +141,7 @@
 .totals-section {
   margin: 2rem 0;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
 }
 
 .totals-container {

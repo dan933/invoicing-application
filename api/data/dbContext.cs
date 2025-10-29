@@ -49,7 +49,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<Invoice>().Property(e => e.Id).HasColumnName("id").HasColumnType("uuid");
         modelBuilder.Entity<Invoice>().Property(e => e.Status).HasColumnName("status");
         modelBuilder.Entity<Invoice>().Property(e => e.CustomerId).HasColumnName("customer_id");
-        modelBuilder.Entity<Invoice>().Property(e => e.InvoiceReference).HasColumnName("invoice_reference");
+        modelBuilder.Entity<Invoice>().Property(e => e.InvoiceReference).HasColumnName("invoice_reference").ValueGeneratedOnAdd();
         modelBuilder.Entity<Invoice>().Property(e => e.InvoiceDate).HasColumnName("invoice_date").HasConversion(v => v.ToUniversalTime(), v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
         modelBuilder.Entity<Invoice>().Property(e => e.DueDate).HasColumnName("due_date").HasConversion(v => v.ToUniversalTime(), v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
         modelBuilder.Entity<Invoice>().Property(e => e.CreatedAt).HasColumnName("created_at").HasConversion(v => v.ToUniversalTime(), v => DateTime.SpecifyKind(v, DateTimeKind.Utc));

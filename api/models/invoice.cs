@@ -5,7 +5,7 @@ public class Invoice
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Status { get; set; } = "";
     public Guid CustomerId { get; set; } = Guid.NewGuid();
-    public string InvoiceReference { get; set; } = "";
+    public int InvoiceReference { get; set; } = 0;
     public DateTime InvoiceDate { get; set; } = DateTime.UtcNow;
     public DateTime DueDate { get; set; } = DateTime.UtcNow;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

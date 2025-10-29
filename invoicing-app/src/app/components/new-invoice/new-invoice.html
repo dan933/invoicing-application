@@ -1,4 +1,11 @@
 <section class="page">
+
+    @if(loading()){
+    <mat-spinner style="margin:auto;" diameter="80" strokeWidth="4"></mat-spinner>
+    }
+
+
+    @if(!loading()){
     @if (screenWidth() > 700) {
     <div class="invoice-details-grid">
         <div class="item-container span-3">
@@ -144,13 +151,6 @@
     </div>
     }
 
-    <div class="invoice-reference-section">
-        <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Invoice Reference</mat-label>
-            <input matInput [formControl]="invoice.controls.invoiceReference" placeholder="Enter Invoice Reference">
-        </mat-form-field>
-    </div>
-
     <div class="invoice-input-section">
         <mat-form-field appearance="outline">
             <mat-label>Invoice Date</mat-label>
@@ -168,15 +168,17 @@
             <mat-datepicker #pickerDueDate></mat-datepicker>
         </mat-form-field>
     </div>
-    <div class="flex column gap-5">
-        <mat-slide-toggle [formControl]="invoice.controls.gst">
-        </mat-slide-toggle>
-        <span>{{invoice.value.gst ? "GST" : "No GST"}}</span>
-    </div>
-    <div class="flex column  gap-5">
-        <mat-slide-toggle [formControl]="invoice.controls.paid">
-        </mat-slide-toggle>
-        <span>{{invoice.value.paid ? "Paid" : "Unpaid"}}</span>
+    <div class="flex gap-30 wrap">
+        <div style="width: 110px;">
+            <mat-slide-toggle [formControl]="invoice.controls.gst">
+                <span>{{invoice.value.gst ? "GST" : "No GST"}}</span>
+            </mat-slide-toggle>
+        </div>
+        <div style="width: 110px;">
+            <mat-slide-toggle [formControl]="invoice.controls.paid">
+                <span>{{invoice.value.paid ? "Paid" : "Unpaid"}}</span>
+            </mat-slide-toggle>
+        </div>
     </div>
 
     <div class="line-items-section">
@@ -191,12 +193,12 @@
 
             <mat-form-field appearance="outline">
                 <mat-label>Quantity</mat-label>
-                <input type="number" step="1" min="1" matInput [formControl]="$any(item.get('quantity'))" min="1">
+                <input type="number" step="1" min="1" matInput [formControl]="$any(item.get('quantity'))">
             </mat-form-field>
 
             <mat-form-field appearance="outline">
                 <mat-label>Unit Price</mat-label>
-                <input matInput type="number" step="1" min="1" [formControl]="$any(item.get('unitPrice'))" step="0.01"
+                <input matInput type="number" step="1" min="1" [formControl]="$any(item.get('unitPrice'))" step="1"
                     min="0">
             </mat-form-field>
 
@@ -224,6 +226,16 @@
     </div>
 
     <div class="totals-section">
+
+        <div class="save-section">
+            <button style="position: relative; margin-bottom: 2rem;" mat-raised-button color="primary"
+                [class]="`btn ${!isValidForm ? 'btn-disabled' : ''}`" (click)="createInvoice()">
+                <mat-icon>save</mat-icon>
+                <span style="position: relative; bottom: 6px;">
+                    Create Invoice
+                </span>
+            </button>
+        </div>
         <div class="totals-container">
             @if (invoice.value.gst) {
             <div class="total-row">
@@ -244,14 +256,7 @@
             </div>
         </div>
     </div>
-    <div class="save-section">
-        <button style="position: relative; margin-bottom: 2rem;" mat-raised-button color="primary"
-            [class]="`btn ${!isValidForm ? 'btn-disabled' : ''}`" (click)="createInvoice()">
-            <mat-icon>save</mat-icon>
-            <span style="position: relative; bottom: 6px;">
-                Create Invoice
-            </span>
-        </button>
-    </div>
+
+    }
 
 </section>

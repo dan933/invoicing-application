@@ -15,7 +15,6 @@ public class InvoiceService(AppDbContext _context)
         var invoice = new Invoice
         {
             CustomerId = invoiceRequest.CustomerId,
-            InvoiceReference = invoiceRequest.InvoiceReference,
             InvoiceDate = invoiceRequest.InvoiceDate,
             DueDate = invoiceRequest.DueDate,
             Status = "Active",
