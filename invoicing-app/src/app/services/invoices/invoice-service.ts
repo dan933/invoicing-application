@@ -20,23 +20,19 @@ export interface CreateInvoiceRequest {
     | undefined;
 }
 
-export interface Invoice {
+export interface InvoiceSummary {
   id: string;
   invoiceReference: string;
+  customerId: string;
+  customerCode: string;
   invoiceDate: string;
-  subTotal: string;
+  subTotal: number;
   paid: boolean;
   gst: boolean;
-  lineItems?: {
-    description: string;
-    quantity: number;
-    unitPrice: number;
-    total: number;
-  }[];
 }
 
-export interface InvoiceApi {
-  items: Invoice[];
+export interface InvoiceSummaryResposne {
+  items: InvoiceSummary[];
   total_count: number;
 }
 
@@ -64,10 +60,86 @@ export interface InvoiceDetails {
 })
 export class InvoiceService {
   api = inject(Api);
-  private readonly _invoices = signal<Invoice[]>([]);
-  invoices = this._invoices.asReadonly();
 
-  getInvoices(sort: string, order: SortDirection, page: number) {}
+  async listInvoices(
+    sort: string,
+    order: SortDirection,
+    page: number,
+    search?: string,
+    customerId?: string,
+    invoiceDateFrom?: string,
+    invoiceDateTo?: string
+  ): Promise<InvoiceSummaryResposne> {
+    return await this.api
+      .Post(`${environment.apiUrl}/invoices/list`, {
+        sortColumn: sort,
+        sortDirection: order,
+        pageNumber: page + 1,
+        pageSize: 30,
+        ...(customerId && {
+          customerId: customerId,
+        }),
+        ...(invoiceDateFrom && {
+          invoiceDateFrom: invoiceDateFrom,
+        }),
+        ...(invoiceDateTo && {
+          invoiceDateTo: invoiceDateTo,
+        }),
+        ...(search && {
+          search: search,
+        }),
+      })
+      .then((response) => {
+        if (response?.data?.[0]?.id) {
+          const invoices = response.data.map(
+            (item: {
+              company: string;
+              customerCode: string;
+              customerId: string;
+              dueDate: string;
+              email: string;
+              firstName: string;
+              gst: boolean;
+              id: string;
+              invoiceDate: string;
+              invoiceReference: number;
+              lastName: string;
+              paid: boolean;
+              status: 'Active';
+              totalPrice: number;
+            }) => {
+              return {
+                id: item.id,
+                invoiceReference: `${item.customerCode}-${item.invoiceReference
+                  .toString()
+                  .padStart(3, '0')}`,
+                customerId: item.customerId,
+                customerCode: item.customerCode,
+                invoiceDate: new Date(item.invoiceDate).toLocaleDateString('en-GB'),
+                subTotal: (item.totalPrice / 100).toLocaleString('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                }),
+                paid: item.paid,
+                gst: item.gst,
+              };
+            }
+          );
+
+          const total_count = response.pagination?.totalPages || 0;
+
+          return {
+            items: invoices,
+            total_count: total_count,
+          };
+        }
+
+        return {
+          items: [],
+          total_count: 0,
+        };
+      });
+  }
 
   async createInvoice(request: CreateInvoiceRequest): Promise<{ invoice: { id: string } }> {
     const createResponse = await this.api.Post(`${environment.apiUrl}/invoices/create`, request);

@@ -9,7 +9,6 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-  Invoice,
   InvoiceService,
   InvoiceDetails as InvoiceDetailsType,
 } from '../../services/invoices/invoice-service';

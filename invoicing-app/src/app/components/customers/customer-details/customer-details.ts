@@ -19,7 +19,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { catchError, map, merge, Observable, of as observableOf, startWith, switchMap } from 'rxjs';
-import { Invoice, InvoiceApi, InvoiceService } from '../../../services/invoices/invoice-service';
+import { InvoiceSummary, InvoiceService } from '../../../services/invoices/invoice-service';
 import { EditCustomer } from '../edit-customer/edit-customer';
 import { Customer, CustomerService } from '../../../services/customers/customer-service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -58,10 +58,10 @@ export class CustomerDetails implements AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   invoiceData!: HttpDatabase | null;
-  invoices: Invoice[] = [];
+  invoiceSummaries: InvoiceSummary[] = [];
   customer: Customer | null = null;
 
-  displayedColumns: string[] = ['invoiceNumber', 'date', 'subTotal', 'paid', 'gst'];
+  displayedColumns: string[] = ['invoiceReference', 'invoiceDate', 'totalPrice', 'paid', 'gst'];
 
   resultsLength = 0;
   isLoadingInvoices = signal(true);
@@ -69,7 +69,34 @@ export class CustomerDetails implements AfterViewInit {
 
   ngAfterViewInit() {
     this.getCustomer();
-    this.isLoadingInvoices.set(false);
+
+    this.sort.sortChange.subscribe(() => {
+      this.paginator.pageIndex = 0;
+
+      this.loadInvoices();
+    });
+
+    this.loadInvoices();
+  }
+
+  async loadInvoices() {
+    this.isLoadingInvoices.set(true);
+    await this.invoiceService
+      .listInvoices(
+        this.sort.active,
+        this.sort.direction,
+        this.paginator.pageIndex,
+        undefined,
+        this.customer?.id
+      )
+      .then((response) => {
+        this.invoiceSummaries = response.items;
+        this.resultsLength = response.total_count;
+      })
+      .catch(() => {})
+      .finally(() => {
+        this.isLoadingInvoices.set(false);
+      });
   }
 
   async getCustomer() {

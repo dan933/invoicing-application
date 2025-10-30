@@ -10,6 +10,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Invoice> Invoices { get; set; }
     public DbSet<InvoiceItem> InvoiceItems { get; set; }
+    public DbSet<InvoiceSummary> InvoiceSummaries { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -52,6 +53,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<Invoice>().Property(e => e.InvoiceReference).HasColumnName("invoice_reference").ValueGeneratedOnAdd();
         modelBuilder.Entity<Invoice>().Property(e => e.InvoiceDate).HasColumnName("invoice_date").HasConversion(v => v.ToUniversalTime(), v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
         modelBuilder.Entity<Invoice>().Property(e => e.DueDate).HasColumnName("due_date").HasConversion(v => v.ToUniversalTime(), v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+        modelBuilder.Entity<Invoice>().Property(e => e.Gst).HasColumnName("gst");
+        modelBuilder.Entity<Invoice>().Property(e => e.Paid).HasColumnName("paid");
         modelBuilder.Entity<Invoice>().Property(e => e.CreatedAt).HasColumnName("created_at").HasConversion(v => v.ToUniversalTime(), v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
         modelBuilder.Entity<Invoice>().Property(e => e.UpdatedAt).HasColumnName("updated_at").HasConversion(v => v.ToUniversalTime(), v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
         modelBuilder.Entity<Invoice>()
@@ -72,6 +75,25 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasOne<Invoice>()
             .WithMany()
             .HasForeignKey(i => i.InvoiceId);
+
+        modelBuilder.Entity<InvoiceSummary>().ToView("invoice_summaries");
+        modelBuilder.Entity<InvoiceSummary>().Property(e => e.Id).HasColumnName("id");
+        modelBuilder.Entity<InvoiceSummary>().Property(e => e.CustomerId).HasColumnName("customer_id");
+        modelBuilder.Entity<InvoiceSummary>().Property(e => e.CustomerCode).HasColumnName("customer_code");
+        modelBuilder.Entity<InvoiceSummary>().Property(e => e.FirstName).HasColumnName("first_name");
+        modelBuilder.Entity<InvoiceSummary>().Property(e => e.LastName).HasColumnName("last_name");
+        modelBuilder.Entity<InvoiceSummary>().Property(e => e.Company).HasColumnName("company");
+        modelBuilder.Entity<InvoiceSummary>().Property(e => e.Email).HasColumnName("email");
+        modelBuilder.Entity<InvoiceSummary>().Property(e => e.InvoiceReference).HasColumnName("invoice_reference");
+        modelBuilder.Entity<InvoiceSummary>().Property(e => e.Status).HasColumnName("status");
+        modelBuilder.Entity<InvoiceSummary>().Property(e => e.InvoiceDate).HasColumnName("invoice_date");
+        modelBuilder.Entity<InvoiceSummary>().Property(e => e.DueDate).HasColumnName("due_date");
+        modelBuilder.Entity<InvoiceSummary>().Property(e => e.TotalPrice).HasColumnName("total_price");
+        modelBuilder.Entity<InvoiceSummary>().Property(e => e.Gst).HasColumnName("gst");
+        modelBuilder.Entity<InvoiceSummary>().Property(e => e.Paid).HasColumnName("paid");
+        modelBuilder.Entity<InvoiceSummary>().HasNoKey();
+
+
     }
 
 }

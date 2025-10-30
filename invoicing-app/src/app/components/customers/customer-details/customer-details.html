@@ -183,17 +183,17 @@
         }
 
         <div class="table-container">
-            <table mat-table [dataSource]="invoices" class="example-table" matSort matSortActive="customerCode"
+            <table mat-table [dataSource]="invoiceSummaries" class="example-table" matSort matSortActive="customerCode"
                 matSortDisableClear matSortDirection="desc">
-                <ng-container matColumnDef="invoiceNumber">
+                <ng-container matColumnDef="invoiceReference">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>Invoice Number</th>
                     <td mat-cell *matCellDef="let row">{{row.invoiceReference}}</td>
                 </ng-container>
-                <ng-container matColumnDef="date">
+                <ng-container matColumnDef="invoiceDate">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
                     <td mat-cell *matCellDef="let row">{{row.invoiceDate}}</td>
                 </ng-container>
-                <ng-container matColumnDef="subTotal">
+                <ng-container matColumnDef="totalPrice">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>Sub Total</th>
                     <td mat-cell *matCellDef="let row">{{row.subTotal}}</td>
                 </ng-container>

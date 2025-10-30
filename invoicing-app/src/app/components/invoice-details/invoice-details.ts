@@ -1,7 +1,6 @@
 import { Component, HostListener, inject, signal, LOCALE_ID, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
-  Invoice,
   InvoiceService,
   InvoiceDetails as InvoiceDetailsType,
 } from '../../services/invoices/invoice-service';
