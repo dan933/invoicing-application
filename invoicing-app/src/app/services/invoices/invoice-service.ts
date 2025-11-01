@@ -50,7 +50,7 @@ export interface InvoiceDetails {
   paid: boolean;
   gst: boolean;
   lineItems: {
-    id: string;
+    id?: string;
     description: string;
     quantity: number;
     unitPrice: number;

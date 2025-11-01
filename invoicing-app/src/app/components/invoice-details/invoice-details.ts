@@ -314,7 +314,7 @@ export class InvoiceDetails implements OnInit {
       gst: this.invoice.value.gst || false,
       lineItems: (this.invoice.value.lineItems || [])?.map((item) => {
         return {
-          id: item.id || '',
+          ...(item.id && { id: item.id }),
           description: item.description!,
           quantity: item.quantity!,
           unitPrice: item.unitPrice! * 100,
