@@ -187,4 +187,8 @@ export class InvoiceService {
       invoiceDetails
     );
   }
+
+  deleteInvoice(invoiceId: string) {
+    return this.api.Delete(`${environment.apiUrl}/invoices/delete/${invoiceId}`);
+  }
 }

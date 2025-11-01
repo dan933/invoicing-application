@@ -50,7 +50,7 @@ public static class InvoiceRoutes
 
         });
 
-        endpoints.MapPost("/invoices/list", async (PagedInvoiceRequest request, InvoiceService service, PermissionService permissionService, ClaimsPrincipal user) =>
+        endpoints.MapDelete("/invoices/delete/{id}", async (Guid id, InvoiceService invoiceService, PermissionService permissionService, ClaimsPrincipal user) =>
         {
             var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -65,8 +65,27 @@ public static class InvoiceRoutes
                 return Results.Forbid();
             }
 
-            return Results.Ok(await service.ListInvoices(request));
+
+            return Results.Ok(await invoiceService.DeleteInvoice(id));
         }).RequireAuthorization();
+
+        endpoints.MapPost("/invoices/list", async (PagedInvoiceRequest request, InvoiceService service, PermissionService permissionService, ClaimsPrincipal user) =>
+            {
+                var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (userIdClaim == null || !Guid.TryParse(userIdClaim, out var userId))
+                {
+                    return Results.Unauthorized();
+                }
+
+                var hasAdminPermission = await permissionService.HasPermission(userId, "Admin");
+                if (!hasAdminPermission)
+                {
+                    return Results.Forbid();
+                }
+
+                return Results.Ok(await service.ListInvoices(request));
+            }).RequireAuthorization();
 
         endpoints.MapGet("/invoices/{id}", async (Guid id, InvoiceService service, PermissionService permissionService, ClaimsPrincipal user) =>
         {

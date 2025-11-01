@@ -1,4 +1,13 @@
-import { Component, HostListener, inject, signal, LOCALE_ID, OnInit } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  inject,
+  signal,
+  LOCALE_ID,
+  OnInit,
+  ChangeDetectionStrategy,
+  model,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   InvoiceService,
@@ -27,6 +36,16 @@ import { Observable, startWith, switchMap } from 'rxjs';
 import { SnackbarService } from '../../services/snackbar/snack-bar';
 import { AsyncPipe } from '@angular/common';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogActions,
+  MatDialogClose,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
 
 export const DD_MM_YYYY_FORMAT = {
   parse: {
@@ -78,6 +97,8 @@ export class InvoiceDetails implements OnInit {
   invoiceId = this.route.snapshot.paramMap.get('invoiceId');
   customerId: string | null = null;
   invoiceReference = signal<string>('');
+
+  readonly deleteDialog = inject(MatDialog);
 
   invoice = this.fb.group({
     invoiceDate: [new Date(), Validators.required],
@@ -323,10 +344,67 @@ export class InvoiceDetails implements OnInit {
     this.snackbar.error('Failed to update invoice');
   }
 
+  openDeleteDialog() {
+    this.deleteDialog
+      .open(DialogDeleteInvoice, {
+        width: '300px',
+      })
+      .afterClosed()
+      .subscribe((result) => {
+        console.log(result);
+        if (result) {
+          this.deleteInvoice();
+        }
+      });
+  }
+
+  async deleteInvoice() {
+    if (!this.invoiceId) return;
+
+    this.loading.set(true);
+
+    const deleteInvoiceResponse = await this.invoiceService
+      .deleteInvoice(this.invoiceId)
+      .catch((err) => {
+        this.snackbar.error('Failed to delete invoice');
+        this.loading.set(false);
+        return;
+      });
+
+    this.loading.set(false);
+
+    if (deleteInvoiceResponse?.id) {
+      this.snackbar.success('Invoice deleted successfully!');
+      this.router.navigate(['/customers-details', this.customerId]);
+      return;
+    }
+
+    this.snackbar.error('Failed to delete invoice');
+  }
+
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
     // console.log('window.innerWidth', window.innerWidth);
 
     this.screenWidth.set(window.innerWidth);
+  }
+}
+
+@Component({
+  selector: 'dialog-delete-invoice',
+  templateUrl: 'dialog-delete-invoice.html',
+  imports: [MatButtonModule, MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class DialogDeleteInvoice {
+  readonly dialogRef = inject(MatDialogRef<DialogDeleteInvoice>);
+  readonly data = inject<any>(MAT_DIALOG_DATA);
+
+  cancel() {
+    this.dialogRef.close();
+  }
+
+  confirm() {
+    this.dialogRef.close(true);
   }
 }

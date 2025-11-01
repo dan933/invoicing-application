@@ -70,9 +70,6 @@ export class CustomerDetails implements AfterViewInit {
   ngAfterViewInit() {
     this.getCustomer();
 
-    this.sort.active = 'invoiceReference';
-    this.sort.direction = 'desc';
-
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
 

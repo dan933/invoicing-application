@@ -109,6 +109,31 @@ public class InvoiceService(AppDbContext _context)
         return new InvoiceWithItems(invoice, invoiceItems);
     }
 
+    public class DeleteInvoiceResponse
+    {
+        public Guid Id { get; set; }
+    };
+
+
+    public async Task<DeleteInvoiceResponse> DeleteInvoice(Guid id)
+    {
+        var invoice = await _context.Invoices.FirstOrDefaultAsync(i => i.Id == id) ?? throw new KeyNotFoundException("Invoice not found");
+
+        var invoiceItems = await _context.InvoiceItems.Where(ii => ii.InvoiceId == id).ToListAsync();
+
+        _context.InvoiceItems.RemoveRange(invoiceItems);
+
+        invoice.Status = "Deleted";
+        invoice.UpdatedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        var response = new DeleteInvoiceResponse { Id = invoice.Id };
+
+        return response;
+    }
+
+
     public async Task<PaginatedInvoicesResponse> ListInvoices(PagedInvoiceRequest listInvoiceRequest)
     {
         var search = listInvoiceRequest.Search;
@@ -181,7 +206,6 @@ public class InvoiceService(AppDbContext _context)
         return new PaginatedInvoicesResponse(invoices, pagination);
     }
 
-
     public async Task<InvoiceDetails> GetInvoice(Guid invoiceId)
     {
         var invoice = await _context.InvoiceSummaries.Select(item => new
@@ -234,4 +258,5 @@ public class InvoiceService(AppDbContext _context)
 
         return invoiceDetails;
     }
+
 }

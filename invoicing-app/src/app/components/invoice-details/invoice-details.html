@@ -253,6 +253,13 @@
                     Update Invoice
                 </span>
             </button>
+            <button style="position: relative; margin-bottom: 2rem; height: 50px;" mat-raised-button color="primary"
+                class="btn btn-warn" (click)="openDeleteDialog()">
+                <mat-icon>delete</mat-icon>
+                <span style="position: relative; bottom: 6px;">
+                    Delete Invoice
+                </span>
+            </button>
         </div>
         <div class="totals-container">
             @if (invoice.value.gst) {

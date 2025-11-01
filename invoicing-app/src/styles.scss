@@ -183,7 +183,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .btn-warn {
     padding: 0.75rem;
-    background: var(--warning);
+    background: var(--danger);
     color: white;
     border: none;
     border-radius: 4px;
@@ -191,7 +191,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     font-size: 1rem;
     
     &:hover {
-      background: #e08900;
+      background: #ef4444ac;
     }
 }
 
