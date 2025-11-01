@@ -77,6 +77,7 @@ export class InvoiceDetails implements OnInit {
   customerFilterOptions: Observable<Customer[]> = new Observable<Customer[]>();
   invoiceId = this.route.snapshot.paramMap.get('invoiceId');
   customerId: string | null = null;
+  invoiceReference = signal<string>('');
 
   invoice = this.fb.group({
     invoiceDate: [new Date(), Validators.required],
@@ -86,6 +87,7 @@ export class InvoiceDetails implements OnInit {
     paid: [false],
     lineItems: this.fb.array<
       FormGroup<{
+        id: FormControl<string | null>;
         description: FormControl<string | null>;
         quantity: FormControl<number | null>;
         unitPrice: FormControl<number | null>;
@@ -103,6 +105,7 @@ export class InvoiceDetails implements OnInit {
           Validators.min(0.01),
           this.maxDecimalPlacesValidator(2),
         ]),
+        id: this.fb.control(''),
       }),
     ]),
   });
@@ -122,11 +125,12 @@ export class InvoiceDetails implements OnInit {
       console.log(invoice?.lineItems);
 
       if (invoice) {
+        this.invoiceReference.set(invoice.invoiceReference);
         this.customerId = invoice.customerId;
         this.invoice.patchValue({
-          invoiceDate: new Date(invoice.invoiceDate),
-          dueDate: new Date(invoice.dueDate),
-          subTotal: invoice.subTotal,
+          invoiceDate: this.utils.convertUtcToLocal(invoice.invoiceDate),
+          dueDate: this.utils.convertUtcToLocal(invoice.dueDate),
+          subTotal: invoice.subTotal / 100,
           gst: invoice.gst,
           paid: invoice.paid,
         });
@@ -137,6 +141,7 @@ export class InvoiceDetails implements OnInit {
           this.invoice.controls.lineItems.push(
             invoice.lineItems.map((item) => {
               return this.fb.group({
+                id: this.fb.control(item.id || null),
                 description: this.fb.control(item.description, Validators.required),
                 quantity: this.fb.control(item.quantity, [
                   Validators.required,
@@ -197,6 +202,7 @@ export class InvoiceDetails implements OnInit {
 
   removeLineItem(
     item: FormGroup<{
+      id: FormControl<string | null>;
       description: FormControl<string | null>;
       quantity: FormControl<number | null>;
       unitPrice: FormControl<number | null>;
@@ -211,6 +217,7 @@ export class InvoiceDetails implements OnInit {
   addLineItem() {
     this.invoice.controls.lineItems.push(
       this.fb.group({
+        id: this.fb.control(''),
         description: this.fb.control('', Validators.required),
         quantity: this.fb.control(0, [
           Validators.required,
@@ -263,39 +270,55 @@ export class InvoiceDetails implements OnInit {
     };
   }
 
-  async createInvoice() {
+  async updateInvoice() {
     if (!this.isValidForm || !this.selectedCustomer.value?.id) return;
 
-    const payload = {
+    const payload: InvoiceDetailsType = {
+      id: this.invoiceId!,
+      //Not needed for update
+      invoiceReference: '',
+      customerCode: this.selectedCustomer.value.customerCode,
       customerId: this.selectedCustomer.value.id,
-      invoiceDate: this.invoice.value.invoiceDate,
-      dueDate: this.invoice.value.dueDate,
-      paid: this.invoice.value.paid,
-      gst: this.invoice.value.gst,
-      lineItems: this.invoice.value.lineItems?.map((item) => {
+      customerName: '',
+      companyName: '',
+      email: '',
+      invoiceDate: this.utils
+        .convertUtcToLocal(this.invoice.value.invoiceDate?.toISOString() || '')
+        .toISOString(),
+      subTotal: this.subTotal * 100,
+      dueDate: this.utils
+        .convertUtcToLocal(this.invoice.value.dueDate?.toISOString() || '')
+        .toISOString(),
+      paid: this.invoice.value.paid || false,
+      gst: this.invoice.value.gst || false,
+      lineItems: (this.invoice.value.lineItems || [])?.map((item) => {
         return {
-          description: item.description,
-          quantity: item.quantity,
+          id: item.id || '',
+          description: item.description!,
+          quantity: item.quantity!,
           unitPrice: item.unitPrice! * 100,
           totalPrice: item.unitPrice! * 100 * item.quantity!,
         };
       }),
     };
 
+    console.log({ payload });
+
     this.loading.set(true);
 
-    // const createInvoiceResponse = await this.invoiceService
-    //   .createInvoice(payload)
-    //   .catch((err) => {})
-    //   .finally(() => {
-    //     this.loading.set(false);
-    //   });
+    const updateInvoiceResponse = await this.invoiceService.updateInvoice(payload).catch((err) => {
+      this.snackbar.error('Failed to update invoice');
+      this.loading.set(false);
+      return;
+    });
 
-    // if (createInvoiceResponse?.invoice?.id) {
-    //   this.snackbar.success('Invoice updated successfully!');
-    //   this.router.navigate(['/customers-details', this.selectedCustomer.value.id]);
-    //   return;
-    // }
+    this.loading.set(false);
+
+    if (updateInvoiceResponse?.invoice?.id) {
+      this.snackbar.success('Invoice updated successfully!');
+      this.router.navigate(['/customers-details', this.selectedCustomer.value.id]);
+      return;
+    }
 
     this.snackbar.error('Failed to update invoice');
   }

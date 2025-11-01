@@ -6,8 +6,8 @@ import { environment } from '../../../environments/environment';
 
 export interface CreateInvoiceRequest {
   customerId: string;
-  invoiceDate: Date | null | undefined;
-  dueDate: Date | null | undefined;
+  invoiceDate: string | null | undefined;
+  dueDate: string | null | undefined;
   paid: boolean | null | undefined;
   gst: boolean | null | undefined;
   lineItems:
@@ -50,6 +50,7 @@ export interface InvoiceDetails {
   paid: boolean;
   gst: boolean;
   lineItems: {
+    id: string;
     description: string;
     quantity: number;
     unitPrice: number;
@@ -154,6 +155,9 @@ export class InvoiceService {
       if (resp?.id) {
         return {
           ...resp,
+          invoiceReference: `${resp.customerCode}-${resp.invoiceReference
+            .toString()
+            .padStart(3, '0')}`,
           amount: resp.subTotal / 100,
           lineItems: resp.lineItems.map((lineItem: any) => {
             return {
@@ -178,7 +182,9 @@ export class InvoiceService {
   }
 
   updateInvoice(invoiceDetails: InvoiceDetails) {
-    console.log('invoiceDetails', invoiceDetails);
-    return observableOf(null);
+    return this.api.Post(
+      `${environment.apiUrl}/invoices/update/${invoiceDetails.id}`,
+      invoiceDetails
+    );
   }
 }

@@ -64,6 +64,51 @@ public class InvoiceService(AppDbContext _context)
     }
 
 
+    public async Task<InvoiceWithItems> UpdateInvoice(Guid id, SetInvoiceRequest invoiceRequest)
+    {
+        var invoice = await _context.Invoices.FirstOrDefaultAsync(i => i.Id == id) ?? throw new KeyNotFoundException("Invoice not found");
+
+        invoice.CustomerId = invoiceRequest.CustomerId;
+        invoice.InvoiceDate = invoiceRequest.InvoiceDate;
+        invoice.DueDate = invoiceRequest.DueDate;
+        invoice.Gst = invoiceRequest.Gst;
+        invoice.Paid = invoiceRequest.Paid;
+        invoice.UpdatedAt = DateTime.UtcNow;
+
+        // Get line item documents
+        var existingItems = await _context.InvoiceItems.Where(ii => ii.InvoiceId == id).ToListAsync();
+
+        //Remove existing items
+        _context.InvoiceItems.RemoveRange(existingItems);
+
+        //Add new items
+        var invoiceItems = new List<InvoiceItem>();
+
+        foreach (var item in invoiceRequest.LineItems)
+        {
+            var invoiceItem = new InvoiceItem
+            {
+                InvoiceId = id,
+                Description = item.Description,
+                Quantity = item.Quantity,
+                UnitPrice = item.UnitPrice,
+                TotalPrice = item.TotalPrice,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _context.InvoiceItems.Add(invoiceItem);
+            invoiceItems.Add(invoiceItem);
+        }
+
+        _context.InvoiceItems.AddRange(invoiceItems);
+
+        //save changes
+        await _context.SaveChangesAsync();
+
+        return new InvoiceWithItems(invoice, invoiceItems);
+    }
+
     public async Task<PaginatedInvoicesResponse> ListInvoices(PagedInvoiceRequest listInvoiceRequest)
     {
         var search = listInvoiceRequest.Search;

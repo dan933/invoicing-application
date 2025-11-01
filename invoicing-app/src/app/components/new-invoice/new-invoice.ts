@@ -197,8 +197,12 @@ export class NewInvoice implements OnInit {
 
     const payload = {
       customerId: this.selectedCustomer.value.id,
-      invoiceDate: this.invoice.value.invoiceDate,
-      dueDate: this.invoice.value.dueDate,
+      invoiceDate: this.utils
+        .convertUtcToLocal(this.invoice.value.invoiceDate?.toISOString() || '')
+        .toISOString(),
+      dueDate: this.utils
+        .convertUtcToLocal(this.invoice.value.dueDate?.toISOString() || '')
+        .toISOString(),
       paid: this.invoice.value.paid,
       gst: this.invoice.value.gst,
       lineItems: this.invoice.value.lineItems?.map((item) => {

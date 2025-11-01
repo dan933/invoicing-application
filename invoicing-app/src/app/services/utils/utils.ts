@@ -15,4 +15,9 @@ export class Utils {
     }
     return null;
   }
+
+  convertUtcToLocal(utcDateString: string): Date {
+    const utcDate = new Date(utcDateString);
+    return new Date(utcDate.getTime() - utcDate.getTimezoneOffset() * 60000);
+  }
 }

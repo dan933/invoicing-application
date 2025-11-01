@@ -24,6 +24,9 @@
     .span-4 {
         grid-column: span 4;
     }
+    .span-6 {
+        grid-column: span 6;
+    }
 }
 
 .item-container{
@@ -149,6 +152,7 @@
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   padding: 1rem;
+  margin-bottom: 1rem;
   background: #f9f9f9;
 }
 

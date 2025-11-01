@@ -76,6 +76,15 @@
                 {{invoice.value.gst ? 'check_circle' : 'cancel'}}
             </mat-icon>
         </div>
+        <div class="item-container span-6">
+            <span class="item-header">
+                Invoice Number:
+            </span>
+            <br>
+            <span>
+                {{invoiceReference()}}
+            </span>
+        </div>
 
     </div>
     } @else {
@@ -146,6 +155,15 @@
             <mat-icon [style]="{'color':invoice.value.gst ? 'green': 'red'}">
                 {{invoice.value.gst ? 'check_circle' : 'cancel'}}
             </mat-icon>
+        </div>
+        <div class="item-container" style="text-align: center;">
+            <span class="item-header">
+                Invoice Number:
+            </span>
+            <br>
+            <span>
+                {{invoiceReference()}}
+            </span>
         </div>
 
     </div>
@@ -228,8 +246,8 @@
     <div class="totals-section">
 
         <div class="save-section">
-            <button style="position: relative; margin-bottom: 2rem;" mat-raised-button color="primary"
-                [class]="`btn ${!isValidForm ? 'btn-disabled' : ''}`" (click)="createInvoice()">
+            <button style="position: relative; margin-bottom: 2rem; height: 50px;" mat-raised-button color="primary"
+                [class]="`btn ${!isValidForm ? 'btn-disabled' : ''}`" (click)="updateInvoice()">
                 <mat-icon>save</mat-icon>
                 <span style="position: relative; bottom: 6px;">
                     Update Invoice

@@ -29,6 +29,27 @@ public static class InvoiceRoutes
 
         }).RequireAuthorization();
 
+
+        endpoints.MapPost("/invoices/update/{id}", async (Guid id, SetInvoiceRequest request, InvoiceService invoiceService, PermissionService permissionService, ClaimsPrincipal user) =>
+        {
+
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim, out var userId))
+            {
+                return Results.Unauthorized();
+            }
+
+            var hasAdminPermission = await permissionService.HasPermission(userId, "Admin");
+            if (!hasAdminPermission)
+            {
+                return Results.Forbid();
+            }
+
+            return Results.Ok(await invoiceService.UpdateInvoice(id, request));
+
+        });
+
         endpoints.MapPost("/invoices/list", async (PagedInvoiceRequest request, InvoiceService service, PermissionService permissionService, ClaimsPrincipal user) =>
         {
             var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;

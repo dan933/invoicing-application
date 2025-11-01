@@ -33,7 +33,7 @@ CREATE TABLE invoice_items (
 GO
 
 CREATE VIEW invoice_summaries AS
-SELECT invoices.id, invoices.customer_id, cust.customer_code, cust.first_name, cust.last_name, cust.company, cust.email,invoice_reference, invoices.status, invoice_date, due_date, SUM(item.total_price) as total_price, gst, paid from invoices
+SELECT invoices.id, invoices.customer_id, cust.customer_code, cust.first_name, cust.last_name, cust.company, cust.email,invoice_reference, invoices.status, invoice_date, due_date, COALESCE(SUM(item.total_price), 0) as total_price, gst, paid from invoices
 LEFT JOIN invoice_items as item ON invoices.id = item.invoice_id
 INNER JOIN customers AS cust ON invoices.customer_id = cust.id
 WHERE invoices.status = 'Active'
