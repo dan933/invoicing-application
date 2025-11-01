@@ -1,19 +1,32 @@
 import { Component, HostListener, inject, signal, LOCALE_ID, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   InvoiceService,
   InvoiceDetails as InvoiceDetailsType,
 } from '../../services/invoices/invoice-service';
-import { DateAdapter, provideNativeDateAdapter } from '@angular/material/core';
-import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
+import { provideNativeDateAdapter, MatOption } from '@angular/material/core';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+  FormControl,
+} from '@angular/forms';
 
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatNativeDateModule } from '@angular/material/core';
-import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FormsModule } from '@angular/forms';
+import { Utils } from '../../services/utils/utils';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { Customer, CustomerService } from '../../services/customers/customer-service';
+import { Observable, startWith, switchMap } from 'rxjs';
+import { SnackbarService } from '../../services/snackbar/snack-bar';
+import { AsyncPipe } from '@angular/common';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 export const DD_MM_YYYY_FORMAT = {
   parse: {
@@ -35,201 +48,256 @@ export const DD_MM_YYYY_FORMAT = {
     MatDatepickerModule,
     MatFormFieldModule,
     MatNativeDateModule,
-    MatSlideToggle,
-    FormsModule,
     ReactiveFormsModule,
+    FormsModule,
+    MatAutocompleteModule,
+    AsyncPipe,
+    MatSlideToggleModule,
+    MatProgressSpinner,
   ],
   providers: [provideNativeDateAdapter(), { provide: LOCALE_ID, useValue: 'en-GB' }],
   templateUrl: './invoice-details.html',
   styleUrl: './invoice-details.scss',
 })
 export class InvoiceDetails implements OnInit {
-  constructor(private dateAdapter: DateAdapter<Date>) {
-    this.dateAdapter.setLocale('en-GB');
-  }
+  loading = signal(false);
+  screenWidth = signal(window.innerWidth);
+
+  route = inject(ActivatedRoute);
+  router = inject(Router);
+  utils = inject(Utils);
+
+  snackbar = inject(SnackbarService);
+  invoiceService = inject(InvoiceService);
+  customerService = inject(CustomerService);
 
   fb = inject(FormBuilder);
 
-  form = this.fb.group({
+  selectedCustomer = new FormControl<Customer | null>(null);
+  customerFilterOptions: Observable<Customer[]> = new Observable<Customer[]>();
+  invoiceId = this.route.snapshot.paramMap.get('invoiceId');
+  customerId: string | null = null;
+
+  invoice = this.fb.group({
     invoiceDate: [new Date(), Validators.required],
-    customerCode: ['', Validators.required],
-    customerName: ['', Validators.required],
-    companyName: ['', Validators.required],
-    email: ['', Validators.required],
-    invoiceReference: ['', Validators.required],
+    dueDate: [new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), Validators.required],
     subTotal: [0, Validators.required],
     gst: [false],
     paid: [false],
-    lineItems: this.fb.array([]),
+    lineItems: this.fb.array<
+      FormGroup<{
+        description: FormControl<string | null>;
+        quantity: FormControl<number | null>;
+        unitPrice: FormControl<number | null>;
+      }>
+    >([
+      this.fb.group({
+        description: this.fb.control('', Validators.required),
+        quantity: this.fb.control(0, [
+          Validators.required,
+          Validators.min(1),
+          this.utils.wholeNumberValidator,
+        ]),
+        unitPrice: this.fb.control(0, [
+          Validators.required,
+          Validators.min(0.01),
+          this.maxDecimalPlacesValidator(2),
+        ]),
+      }),
+    ]),
   });
 
-  get lineItems() {
-    return this.form.get('lineItems') as FormArray;
-  }
-
-  createLineItem(): FormGroup {
-    return this.fb.group({
-      description: ['', Validators.required],
-      quantity: ['', Validators.required],
-      unitPrice: ['', Validators.required],
-      total: ['', Validators.required],
-    });
-  }
-
-  setGst(event: any) {
-    const checked = event?.checked;
-    console.log('checked', checked);
-
-    this.invoice.update((invoice) => {
-      if (invoice) {
-        return {
-          ...invoice,
-          gst: checked,
-        };
-      } else {
-        return null;
-      }
-    });
-  }
-  screenWidth = signal(window.innerWidth);
-  route = inject(ActivatedRoute);
-  invoiceService = inject(InvoiceService);
-  invoiceId = this.route.snapshot.paramMap.get('id');
-  invoice = signal<InvoiceDetailsType | null>(null);
-  newLineItem = signal<InvoiceDetailsType['lineItems'][0]>({
-    description: '',
-    quantity: 0,
-    unitPrice: 0,
-    total: 0,
-  });
-
-  ngOnInit(): void {
+  async getInvoice() {
     if (this.invoiceId) {
-      const invoice = this.invoiceService.getInvoiceById(this.invoiceId);
-      if (invoice) {
-        console.log('invoice', invoice);
-
-        this.form.patchValue({
-          invoiceDate: invoice?.invoiceDate ? new Date(invoice?.invoiceDate) : new Date(),
-          customerCode: invoice.customerCode,
-          customerName: invoice.customerName,
-          companyName: invoice.companyName,
-          subTotal: invoice.subTotal,
-          invoiceReference: invoice.invoiceReference,
-          email: invoice.email,
-          gst: invoice.gst,
-          paid: invoice.paid,
-          lineItems: invoice.lineItems,
+      this.loading.set(true);
+      const invoice = await this.invoiceService
+        .getInvoiceById(this.invoiceId)
+        .catch((err) => {
+          return null;
+        })
+        .finally(() => {
+          this.loading.set(false);
         });
 
-        // this.invoice.set(invoice);
+      console.log(invoice?.lineItems);
+
+      if (invoice) {
+        this.customerId = invoice.customerId;
+        this.invoice.patchValue({
+          invoiceDate: new Date(invoice.invoiceDate),
+          dueDate: new Date(invoice.dueDate),
+          subTotal: invoice.subTotal,
+          gst: invoice.gst,
+          paid: invoice.paid,
+        });
+
+        this.invoice.controls.lineItems.clear();
+
+        if (invoice?.lineItems?.length) {
+          this.invoice.controls.lineItems.push(
+            invoice.lineItems.map((item) => {
+              return this.fb.group({
+                description: this.fb.control(item.description, Validators.required),
+                quantity: this.fb.control(item.quantity, [
+                  Validators.required,
+                  Validators.min(1),
+                  this.utils.wholeNumberValidator,
+                ]),
+                unitPrice: this.fb.control(item.unitPrice, [
+                  Validators.required,
+                  Validators.min(0.01),
+                  this.maxDecimalPlacesValidator(2),
+                ]),
+              });
+            })
+          );
+        }
       }
     }
   }
 
-  updateInvoiceDate(event: any) {
-    const date = event.value;
-    console.log(date);
-    this.invoice.update((invoice) => {
-      if (invoice) {
-        invoice.invoiceDate = date;
-      }
-      return invoice;
-    });
+  async onPageLoad() {
+    await this.getInvoice();
+    await this.getCustomer();
   }
 
-  removeLineItem(index: number) {
-    this.invoice.update((invoice) => {
-      if (!invoice) return null;
-      let lineItems = invoice?.lineItems || [];
-
-      lineItems = lineItems.filter((item, itemIndex) => {
-        if (index !== itemIndex) {
-          return true;
-        }
-
-        return false;
-      });
-
-      return {
-        ...invoice,
-        lineItems: lineItems,
-      };
-    });
+  constructor() {
+    this.onPageLoad();
   }
 
-  updateLineItem(index: number, field: string, event: any) {
-    const value = event.target.value;
-
-    this.invoice.update((invoice) => {
-      if (!invoice) return null;
-      let lineItems = invoice?.lineItems || [];
-
-      lineItems = lineItems.map((item, itemIndex) => {
-        if (itemIndex === index) {
-          if (field === 'unitPrice') {
-            item.total = item.quantity * +value;
-          }
-
-          return { ...item, [field]: value };
-          // return item;
-        } else {
-          return item;
-        }
-      });
-
-      return {
-        ...invoice,
-        lineItems: lineItems,
-      };
-    });
+  ngOnInit(): void {
+    this.customerFilterOptions = this.selectedCustomer.valueChanges.pipe(
+      startWith(''),
+      switchMap((value) => {
+        const searchTerm = typeof value === 'string' ? value : value?.customerCode || '';
+        return this.customerService.searchCustomers(searchTerm);
+      })
+    );
   }
 
-  updateNewLineItem(field: string, event: any) {
-    const value = event.target.value;
+  customerCodeDisplayFn(value: Customer) {
+    return value?.customerCode || '';
+  }
 
-    this.newLineItem.update((lineItem) => {
-      return {
-        ...lineItem,
-        [field]: value,
-      };
-    });
+  async getCustomer() {
+    if (this.customerId) {
+      this.loading.set(true);
+      const customer = await this.customerService
+        .getCustomerById(this.customerId)
+        .catch((err) => {
+          return null;
+        })
+        .finally(() => {
+          this.loading.set(false);
+        });
+
+      this.selectedCustomer.setValue(customer);
+    }
+  }
+
+  removeLineItem(
+    item: FormGroup<{
+      description: FormControl<string | null>;
+      quantity: FormControl<number | null>;
+      unitPrice: FormControl<number | null>;
+    }>
+  ) {
+    const index = this.invoice.controls.lineItems.controls.indexOf(item);
+    if (index > -1) {
+      this.invoice.controls.lineItems.removeAt(index);
+    }
   }
 
   addLineItem() {
-    this.invoice.update((invoice) => {
-      if (!invoice) return null;
-      let lineItems = invoice?.lineItems || [];
-
-      lineItems = [
-        ...lineItems,
-        {
-          ...this.newLineItem(),
-          total: this.newLineItem().quantity * this.newLineItem().unitPrice,
-        },
-      ];
-
-      return {
-        ...invoice,
-        lineItems: lineItems,
-      };
-    });
-
-    this.newLineItem.set({
-      description: '',
-      quantity: 0,
-      unitPrice: 0,
-      total: 0,
-    });
+    this.invoice.controls.lineItems.push(
+      this.fb.group({
+        description: this.fb.control('', Validators.required),
+        quantity: this.fb.control(0, [
+          Validators.required,
+          Validators.min(1),
+          this.utils.wholeNumberValidator,
+        ]),
+        unitPrice: this.fb.control(0, [
+          Validators.required,
+          Validators.min(0.01),
+          this.maxDecimalPlacesValidator(2),
+        ]),
+      })
+    );
   }
 
-  saveInvoice() {
-    const invoiceData = this.invoice();
-    if (invoiceData) {
-      this.invoiceService.updateInvoice(invoiceData).subscribe(() => {
-        console.log('Invoice saved successfully');
-      });
-    }
+  get isValidForm() {
+    const validInvoice = this.invoice.valid && this.selectedCustomer.value !== null;
+    const validLineItems = this.invoice.controls.lineItems.controls.every((lineItem) => {
+      return lineItem.valid;
+    });
+    const validDates = this.invoice.value.dueDate! > this.invoice.value.invoiceDate!;
+
+    return validInvoice && validLineItems && validDates;
+  }
+
+  get subTotal() {
+    return this.invoice.controls.lineItems.controls.reduce((acc, lineItem) => {
+      return acc + (lineItem.value.unitPrice || 0) * (lineItem.value.quantity || 0);
+    }, 0);
+  }
+
+  get gst() {
+    return this.invoice.value.gst ? this.subTotal * 0.1 : 0;
+  }
+
+  get total() {
+    return this.subTotal + this.gst;
+  }
+
+  maxDecimalPlacesValidator(maxDecimals: number) {
+    return (control: any) => {
+      const value = control.value;
+      if (value !== null) {
+        const decimalPlaces = (value.toString().split('.')[1] || '').length;
+        if (decimalPlaces > maxDecimals) {
+          return { tooManyDecimals: true };
+        }
+      }
+      return null;
+    };
+  }
+
+  async createInvoice() {
+    if (!this.isValidForm || !this.selectedCustomer.value?.id) return;
+
+    const payload = {
+      customerId: this.selectedCustomer.value.id,
+      invoiceDate: this.invoice.value.invoiceDate,
+      dueDate: this.invoice.value.dueDate,
+      paid: this.invoice.value.paid,
+      gst: this.invoice.value.gst,
+      lineItems: this.invoice.value.lineItems?.map((item) => {
+        return {
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice! * 100,
+          totalPrice: item.unitPrice! * 100 * item.quantity!,
+        };
+      }),
+    };
+
+    this.loading.set(true);
+
+    // const createInvoiceResponse = await this.invoiceService
+    //   .createInvoice(payload)
+    //   .catch((err) => {})
+    //   .finally(() => {
+    //     this.loading.set(false);
+    //   });
+
+    // if (createInvoiceResponse?.invoice?.id) {
+    //   this.snackbar.success('Invoice updated successfully!');
+    //   this.router.navigate(['/customers-details', this.selectedCustomer.value.id]);
+    //   return;
+    // }
+
+    this.snackbar.error('Failed to update invoice');
   }
 
   @HostListener('window:resize', ['$event'])

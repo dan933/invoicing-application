@@ -7,12 +7,6 @@ namespace api.services;
 
 public record PaginatedInvoicesResponse(List<InvoiceSummary> Data, Pagination Pagination);
 
-public class PagedInvoiceRequest : PagedRequest
-{
-    public Guid CustomerId { get; set; }
-    public DateTime? InvoiceDateFrom { get; set; }
-    public DateTime? InvoiceDateTo { get; set; }
-}
 
 public class InvoiceService(AppDbContext _context)
 {
@@ -140,5 +134,59 @@ public class InvoiceService(AppDbContext _context)
         };
 
         return new PaginatedInvoicesResponse(invoices, pagination);
+    }
+
+
+    public async Task<InvoiceDetails> GetInvoice(Guid invoiceId)
+    {
+        var invoice = await _context.InvoiceSummaries.Select(item => new
+        {
+            item.Id,
+            item.InvoiceReference,
+            item.CustomerCode,
+            item.CustomerId,
+            item.Company,
+            CustomerName = $"{item.FirstName ?? ""} {item.LastName ?? ""}".Trim(),
+            CompanyName = item.Company,
+            item.Email,
+            item.InvoiceDate,
+            SubTotal = item.TotalPrice,
+            item.Paid,
+            item.Gst,
+            item.DueDate,
+        })
+            .FirstOrDefaultAsync(i => i.Id == invoiceId) ?? throw new InvalidOperationException($"Invoice with ID '{invoiceId}' not found.");
+
+
+        var invoiceItems = await _context.InvoiceItems
+            .Where(i => i.InvoiceId == invoiceId).Select(i => new InvoiceItemDto
+            {
+                Id = i.Id,
+                Description = i.Description,
+                Quantity = i.Quantity,
+                UnitPrice = i.UnitPrice,
+                TotalPrice = i.TotalPrice
+            })
+            .ToListAsync();
+
+
+        var invoiceDetails = new InvoiceDetails
+        {
+            Id = invoice.Id,
+            InvoiceReference = invoice.InvoiceReference,
+            CustomerCode = invoice.CustomerCode,
+            CustomerId = invoice.CustomerId,
+            CustomerName = invoice.CustomerName,
+            CompanyName = invoice.CompanyName,
+            Email = invoice.Email,
+            InvoiceDate = invoice.InvoiceDate,
+            DueDate = invoice.DueDate,
+            SubTotal = invoice.SubTotal,
+            Paid = invoice.Paid,
+            Gst = invoice.Gst,
+            LineItems = invoiceItems
+        };
+
+        return invoiceDetails;
     }
 }

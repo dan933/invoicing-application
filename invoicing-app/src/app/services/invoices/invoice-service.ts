@@ -40,10 +40,12 @@ export interface InvoiceDetails {
   id: string;
   invoiceReference: string;
   customerCode: string;
+  customerId: string;
   customerName: string;
   companyName: string;
   email: string;
   invoiceDate: string;
+  dueDate: string;
   subTotal: number;
   paid: boolean;
   gst: boolean;
@@ -51,7 +53,7 @@ export interface InvoiceDetails {
     description: string;
     quantity: number;
     unitPrice: number;
-    total: number;
+    totalPrice: number;
   }[];
 }
 
@@ -147,7 +149,31 @@ export class InvoiceService {
     return createResponse;
   }
 
-  getInvoiceById(invoiceId: string): InvoiceDetails | null {
+  async getInvoiceById(invoiceId: string): Promise<InvoiceDetails | null> {
+    const invoice = this.api.Get(`${environment.apiUrl}/invoices/${invoiceId}`).then((resp) => {
+      if (resp?.id) {
+        return {
+          ...resp,
+          amount: resp.subTotal / 100,
+          lineItems: resp.lineItems.map((lineItem: any) => {
+            return {
+              ...lineItem,
+              unitPrice: lineItem.unitPrice / 100,
+              totalPrice: lineItem.totalPrice / 100,
+            };
+          }),
+        };
+      } else {
+        return resp;
+      }
+    });
+
+    console.log('invoice', invoice);
+
+    if (invoice) {
+      return invoice;
+    }
+
     return null;
   }
 

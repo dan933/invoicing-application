@@ -28,6 +28,7 @@ public class InvoiceItem
 
 public class InvoiceItemDto
 {
+    public Guid? Id { get; set; }
     public string Description { get; set; } = "";
     public int Quantity { get; set; } = 0;
     public int UnitPrice { get; set; } = 0;
@@ -63,4 +64,30 @@ public class InvoiceSummary
     public long TotalPrice { get; set; }
     public bool Gst { get; set; }
     public bool Paid { get; set; }
+}
+
+
+
+public class PagedInvoiceRequest : PagedRequest
+{
+    public Guid CustomerId { get; set; }
+    public DateTime? InvoiceDateFrom { get; set; }
+    public DateTime? InvoiceDateTo { get; set; }
+}
+
+public class InvoiceDetails
+{
+    public Guid Id { get; set; }
+    public int InvoiceReference { get; set; }
+    public Guid CustomerId { get; set; }
+    public string CustomerCode { get; set; } = "";
+    public string CustomerName { get; set; } = "";
+    public string CompanyName { get; set; } = "";
+    public string Email { get; set; } = "";
+    public DateTime InvoiceDate { get; set; }
+    public DateTime DueDate { get; set; }
+    public long SubTotal { get; set; }
+    public bool Paid { get; set; } = false;
+    public bool Gst { get; set; } = false;
+    public List<InvoiceItemDto> LineItems { get; set; } = [];
 }

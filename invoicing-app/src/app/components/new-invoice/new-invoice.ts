@@ -1,17 +1,6 @@
-import {
-  Component,
-  HostListener,
-  inject,
-  signal,
-  LOCALE_ID,
-  OnInit,
-  computed,
-} from '@angular/core';
+import { Component, HostListener, inject, signal, LOCALE_ID, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import {
-  InvoiceService,
-  InvoiceDetails as InvoiceDetailsType,
-} from '../../services/invoices/invoice-service';
+import { InvoiceService } from '../../services/invoices/invoice-service';
 import { provideNativeDateAdapter } from '@angular/material/core';
 
 import { MatIconModule } from '@angular/material/icon';
@@ -19,7 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatNativeDateModule } from '@angular/material/core';
-import { MatSlideToggle, MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import {
   FormControl,
   FormsModule,
@@ -30,11 +19,11 @@ import {
 } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { Customer, CustomerService } from '../../services/customers/customer-service';
-import { map, Observable, startWith, switchMap } from 'rxjs';
+import { Observable, startWith, switchMap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { SnackbarService } from '../../services/snackbar/snack-bar';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { Utils } from '../../services/utils/utils';
 @Component({
   selector: 'app-invoice-details',
   imports: [
@@ -43,7 +32,6 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatDatepickerModule,
     MatFormFieldModule,
     MatNativeDateModule,
-    // MatSlideToggle,
     ReactiveFormsModule,
     FormsModule,
     MatAutocompleteModule,
@@ -65,6 +53,7 @@ export class NewInvoice implements OnInit {
   snackbar = inject(SnackbarService);
   invoiceService = inject(InvoiceService);
   customerService = inject(CustomerService);
+  utils = inject(Utils);
 
   fb = inject(FormBuilder);
 
@@ -90,7 +79,7 @@ export class NewInvoice implements OnInit {
         quantity: this.fb.control(0, [
           Validators.required,
           Validators.min(1),
-          this.wholeNumberValidator,
+          this.utils.wholeNumberValidator,
         ]),
         unitPrice: this.fb.control(0, [
           Validators.required,
@@ -155,7 +144,7 @@ export class NewInvoice implements OnInit {
         quantity: this.fb.control(0, [
           Validators.required,
           Validators.min(1),
-          this.wholeNumberValidator,
+          this.utils.wholeNumberValidator,
         ]),
         unitPrice: this.fb.control(0, [
           Validators.required,
@@ -188,14 +177,6 @@ export class NewInvoice implements OnInit {
 
   get total() {
     return this.subTotal + this.gst;
-  }
-
-  wholeNumberValidator(control: any) {
-    const value = control.value;
-    if (value !== null && value % 1 !== 0) {
-      return { notWholeNumber: true };
-    }
-    return null;
   }
 
   maxDecimalPlacesValidator(maxDecimals: number) {

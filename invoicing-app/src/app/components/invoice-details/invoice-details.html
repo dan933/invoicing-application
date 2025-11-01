@@ -1,14 +1,26 @@
 <section class="page">
+
+    @if(loading()){
+    <mat-spinner style="margin:auto;" diameter="80" strokeWidth="4"></mat-spinner>
+    }
+
+
+    @if(!loading()){
     @if (screenWidth() > 700) {
     <div class="invoice-details-grid">
         <div class="item-container span-3">
-            <span class="item-header">
-                customer code:
-            </span>
-            <br>
-            <span>
-                {{this.form.value.customerCode}}
-            </span>
+            <mat-form-field appearance="outline">
+                <mat-label>Select Customer</mat-label>
+                <input type="text" matInput [formControl]="selectedCustomer" [matAutocomplete]="auto">
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="customerCodeDisplayFn">
+                    @for (option of customerFilterOptions | async; track option.id) {
+                    <mat-option [value]="option">{{option?.customerCode
+                        || ""}} - {{option?.company || ""}}
+                        {{!option?.company ? option?.firstName || "" : ""}} {{!option?.company ? option?.lastName ||
+                        "" : ""}}</mat-option>
+                    }
+                </mat-autocomplete>
+            </mat-form-field>
         </div>
         <div class="item-container span-3">
             <span class="item-header">
@@ -16,7 +28,7 @@
             </span>
             <br>
             <span>
-                {{this.form.value.customerName}}
+                {{selectedCustomer.value?.firstName || ""}} {{selectedCustomer.value?.lastName || ""}}
             </span>
         </div>
         <div class="item-container span-3">
@@ -25,7 +37,7 @@
             </span>
             <br>
             <span>
-                {{this.form.value.companyName}}
+                {{selectedCustomer.value?.company || ""}}
             </span>
         </div>
         <div class="item-container span-3">
@@ -34,7 +46,7 @@
             </span>
             <br>
             <span>
-                {{this.form.value.email}}
+                {{selectedCustomer.value?.email || ""}}
             </span>
         </div>
         <div class="item-container flex column justify-center span-2">
@@ -42,7 +54,7 @@
                 Sub Total:
             </span>
             <span>
-                {{(form.value.subTotal || 0).toLocaleString('en-US', {
+                {{(invoice.value.subTotal || 0).toLocaleString('en-US', {
                 style: 'currency',
                 currency: 'USD',
                 })}}
@@ -52,16 +64,16 @@
             <span class="item-header">
                 Paid
             </span>
-            <mat-icon [style]="{'color':form.value.paid ? 'green': 'red'}">
-                {{form.value.paid ? 'check_circle' : 'cancel'}}
+            <mat-icon [style]="{'color':invoice.value.paid ? 'green': 'red'}">
+                {{invoice.value.paid ? 'check_circle' : 'cancel'}}
             </mat-icon>
         </div>
         <div class="item-container flex column justify-center align-center span-2" style="text-align: center;">
             <span class="item-header">
                 GST
             </span>
-            <mat-icon [style]="{'color':form.value.gst ? 'green': 'red'}">
-                {{form.value.gst ? 'check_circle' : 'cancel'}}
+            <mat-icon [style]="{'color':invoice.value.gst ? 'green': 'red'}">
+                {{invoice.value.gst ? 'check_circle' : 'cancel'}}
             </mat-icon>
         </div>
 
@@ -69,13 +81,17 @@
     } @else {
     <div style="display: flex; flex-direction: column; gap:5px;">
         <div class="item-container" style="text-align: center;">
-            <span class="item-header">
-                customer code:
-            </span>
-            <br>
-            <span>
-                {{this.form.value.customerCode}}
-            </span>
+            <mat-form-field appearance="outline">
+                <mat-label>Select Customer</mat-label>
+                <input type="text" matInput [formControl]="selectedCustomer" [matAutocomplete]="auto">
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="customerCodeDisplayFn">
+                    @for (option of customerFilterOptions | async; track option.id) {
+                    <mat-option [value]="option">{{option?.customerCode || ""}} - {{option?.company || ""}}
+                        {{!option?.company ? option?.firstName || "" : ""}} {{!option?.company ? option?.lastName ||
+                        "" : ""}}</mat-option>
+                    }
+                </mat-autocomplete>
+            </mat-form-field>
         </div>
         <div class="item-container" style="text-align: center;">
             <span class="item-header">
@@ -83,7 +99,7 @@
             </span>
             <br>
             <span>
-                {{this.form.value.customerName}}
+                {{selectedCustomer.value?.firstName || ""}} {{selectedCustomer.value?.lastName || ""}}
             </span>
         </div>
         <div class="item-container" style="text-align: center;">
@@ -92,7 +108,7 @@
             </span>
             <br>
             <span>
-                {{this.form.value.companyName}}
+                {{selectedCustomer.value?.company || ""}}
             </span>
         </div>
         <div class="item-container" style="text-align: center;">
@@ -101,7 +117,7 @@
             </span>
             <br>
             <span>
-                {{this.form.value.email}}
+                {{selectedCustomer.value?.email || ""}}
             </span>
         </div>
         <div class="item-container flex column justify-center" style="text-align: center;">
@@ -109,7 +125,7 @@
                 Sub Total:
             </span>
             <span>
-                {{(this.form.value.subTotal || 0).toLocaleString('en-US', {
+                {{(invoice.value.subTotal || 0).toLocaleString('en-US', {
                 style: 'currency',
                 currency: 'USD',
                 })}}
@@ -119,96 +135,128 @@
             <span class="item-header">
                 Paid
             </span>
-            <mat-icon [style]="{'color':this.form.value.paid ? 'green': 'red'}">
-                {{this.form.value.paid ? 'check_circle' : 'cancel'}}
+            <mat-icon [style]="{'color':invoice.value.paid ? 'green': 'red'}">
+                {{invoice.value.paid ? 'check_circle' : 'cancel'}}
             </mat-icon>
         </div>
         <div class="item-container flex column justify-center align-center" style="text-align: center;">
             <span class="item-header">
                 GST
             </span>
-            <mat-icon [style]="{'color':this.form.value.gst ? 'green': 'red'}">
-                {{this.form.value.gst ? 'check_circle' : 'cancel'}}
+            <mat-icon [style]="{'color':invoice.value.gst ? 'green': 'red'}">
+                {{invoice.value.gst ? 'check_circle' : 'cancel'}}
             </mat-icon>
         </div>
 
     </div>
     }
 
-    <form [formGroup]="form">
-        <!-- Invoice Date Section -->
-        <div class="invoice-input-section">
-            <mat-form-field appearance="outline">
-                <mat-label>Invoice Date</mat-label>
-                <input matInput [matDatepicker]="picker" formControlName="invoiceDate"
-                    (dateChange)="updateInvoiceDate($event)" placeholder="dd/mm/yyyy">
-                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker></mat-datepicker>
-            </mat-form-field>
-            <mat-slide-toggle [checked]="invoice()?.gst" style="position: relative; top: 10px;"
-                (change)="setGst($event)">
-                {{
-                invoice()?.gst ? "GST" : "No GST"
-                }}</mat-slide-toggle>
+    <div class="invoice-input-section">
+        <mat-form-field appearance="outline">
+            <mat-label>Invoice Date</mat-label>
+            <input matInput [matDatepicker]="picker" [formControl]="invoice.controls.invoiceDate"
+                placeholder="dd/mm/yyyy">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Due Date</mat-label>
+            <input matInput [matDatepicker]="pickerDueDate" [formControl]="invoice.controls.dueDate"
+                placeholder="dd/mm/yyyy">
+            <mat-datepicker-toggle matIconSuffix [for]="pickerDueDate"></mat-datepicker-toggle>
+            <mat-datepicker #pickerDueDate></mat-datepicker>
+        </mat-form-field>
+    </div>
+    <div class="flex gap-30 wrap">
+        <div style="width: 110px;">
+            <mat-slide-toggle [formControl]="invoice.controls.gst">
+                <span>{{invoice.value.gst ? "GST" : "No GST"}}</span>
+            </mat-slide-toggle>
         </div>
+        <div style="width: 110px;">
+            <mat-slide-toggle [formControl]="invoice.controls.paid">
+                <span>{{invoice.value.paid ? "Paid" : "Unpaid"}}</span>
+            </mat-slide-toggle>
+        </div>
+    </div>
 
-        <!-- Line Items Section -->
-        <div class="line-items-section">
-            <h2>Line Items</h2>
+    <div class="line-items-section">
+        <h2>Line Items</h2>
+        @for (item of invoice.controls.lineItems.controls; track $index) {
+        <!-- Existing Line Items -->
+        <div class="line-item-row">
+            <mat-form-field appearance="outline">
+                <mat-label>Description</mat-label>
+                <input matInput [formControl]="$any(item.get('description'))">
+            </mat-form-field>
 
-            @for (item of invoice()?.lineItems; track $index) {
-            <!-- Existing Line Items -->
-            <div class="line-item-row">
-                <mat-form-field appearance="outline">
-                    <input matInput [value]="item.description" (input)="updateLineItem($index, 'description', $event)">
-                </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Quantity</mat-label>
+                <input type="number" step="1" min="1" matInput [formControl]="$any(item.get('quantity'))">
+            </mat-form-field>
 
-                <mat-form-field appearance="outline">
-                    <input matInput type="number" [value]="item.quantity"
-                        (input)="updateLineItem($index, 'quantity', $event)" min="1">
-                </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Unit Price</mat-label>
+                <input matInput type="number" step="1" min="1" [formControl]="$any(item.get('unitPrice'))" step="1"
+                    min="0">
+            </mat-form-field>
 
-                <mat-form-field appearance="outline">
-                    <input matInput type="number" [value]="item.unitPrice"
-                        (input)="updateLineItem($index, 'unitPrice', $event)" step="0.01" min="0">
-                </mat-form-field>
+            <p style="position: relative; bottom: 10px; font-weight: bold;">Item Total:</p>
+            <span class="total-amount">{{((item.get('quantity')?.value || 0) * (item.get('unitPrice')?.value ||
+                0)).toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                })}}</span>
 
-                <span class="total-amount">{{(item.quantity * item.unitPrice).toLocaleString('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
-                    })}}</span>
-
-                <div class="actions">
-                    <button mat-icon-button color="warn" (click)="removeLineItem($index)">
-                        <mat-icon>delete</mat-icon>
-                    </button>
-                </div>
-            </div>
-            }
-
-            <div class="save-section">
-                <button mat-raised-button color="primary" class="btn-secondary flex justify-center align-center"
-                    style="position: relative;" (click)="addLineItem()">
-                    <mat-icon>add</mat-icon>
-                    <span style="position: relative; bottom: 2px;">
-                        Add Item
-                    </span>
+            <div class="actions">
+                <button mat-icon-button color="warn" (click)="removeLineItem(item)">
+                    <mat-icon>delete</mat-icon>
                 </button>
             </div>
-
-
         </div>
+        }
+        <button mat-raised-button color="primary" class="add-line-item btn flex justify-center align-center"
+            style="position: relative;" style="position: relative; bottom: 5px;" (click)="addLineItem()">
+            <mat-icon>add</mat-icon>
+            <span>
+                Add Item
+            </span>
+        </button>
+    </div>
 
-        <!-- Save Button Section -->
-        <div class="add-line-item-section">
-            <button style="position: relative;" mat-raised-button color="primary" class="btn" (click)="saveInvoice()">
+    <div class="totals-section">
+
+        <div class="save-section">
+            <button style="position: relative; margin-bottom: 2rem;" mat-raised-button color="primary"
+                [class]="`btn ${!isValidForm ? 'btn-disabled' : ''}`" (click)="createInvoice()">
                 <mat-icon>save</mat-icon>
                 <span style="position: relative; bottom: 6px;">
-                    Create Invoice
+                    Update Invoice
                 </span>
             </button>
         </div>
+        <div class="totals-container">
+            @if (invoice.value.gst) {
+            <div class="total-row">
+                <span class="total-label">Subtotal:</span>
+                <span class="total-value">{{subTotal.toLocaleString('en-US', { style: 'currency', currency: 'USD'
+                    })}}</span>
+            </div>
+            <div class="total-row">
+                <span class="total-label">GST (10%):</span>
+                <span class="total-value">{{gst.toLocaleString('en-US', { style: 'currency', currency:
+                    'USD' })}}</span>
+            </div>
+            }
+            <div class="total-row final-total">
+                <span class="total-label">Total:</span>
+                <span class="total-value">{{total.toLocaleString('en-US',
+                    { style: 'currency', currency: 'USD' })}}</span>
+            </div>
+        </div>
+    </div>
 
-    </form>
+    }
 
 </section>
