@@ -1,4 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs';
 
 interface MenuItem {
   link: string;
@@ -12,13 +14,26 @@ export class NavService {
   private _menuItems = signal<MenuItem[]>([]);
   private _activeLink = signal<string>('');
   private _showTryDemoButton = signal<boolean>(false);
+  router = inject(Router);
 
   siteTitle = 'Invoice Pro';
   menuItems = this._menuItems.asReadonly();
   showTryDemoButton = this._showTryDemoButton.asReadonly();
 
-  setMenuItems(items: MenuItem[]) {
-    this._menuItems.set(items);
+  constructor() {
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        if (event.url === '/') {
+          this._menuItems.set([]);
+        } else {
+          this.setDefaultMenuItems();
+        }
+      });
+  }
+
+  private setDefaultMenuItems() {
+    this._menuItems.set([{ link: '/customers', label: 'Customers' }]);
   }
 
   setShowTryDemoButton(value: boolean) {

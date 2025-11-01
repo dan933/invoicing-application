@@ -42,7 +42,6 @@ export class Login {
     const loginResponse = await this.authService
       .login(this.email?.value || '', this.password?.value || '')
       .then(() => {
-        this.navService.setMenuItems([{ link: '/customers', label: 'Customers' }]);
         this.router.navigate(['/customers']);
       })
       .catch((err: any) => {
