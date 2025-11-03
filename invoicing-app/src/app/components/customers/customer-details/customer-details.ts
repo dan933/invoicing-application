@@ -18,7 +18,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
-import { catchError, map, merge, Observable, of as observableOf, startWith, switchMap } from 'rxjs';
 import { InvoiceSummary, InvoiceService } from '../../../services/invoices/invoice-service';
 import { EditCustomer } from '../edit-customer/edit-customer';
 import { Customer, CustomerService } from '../../../services/customers/customer-service';

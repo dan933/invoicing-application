@@ -250,14 +250,21 @@
                 [class]="`btn ${!isValidForm ? 'btn-disabled' : ''}`" (click)="updateInvoice()">
                 <mat-icon>save</mat-icon>
                 <span style="position: relative; bottom: 6px;">
-                    Update Invoice
+                    Save
+                </span>
+            </button>
+            <button style="position: relative; margin-bottom: 2rem; height: 50px;" mat-raised-button color="primary"
+                [class]="`btn ${!isValidForm ? 'btn-disabled' : ''}`" (click)="downloadPdf()">
+                <mat-icon>download</mat-icon>
+                <span style="position: relative; bottom: 6px;">
+                    Download
                 </span>
             </button>
             <button style="position: relative; margin-bottom: 2rem; height: 50px;" mat-raised-button color="primary"
                 class="btn btn-warn" (click)="openDeleteDialog()">
                 <mat-icon>delete</mat-icon>
                 <span style="position: relative; bottom: 6px;">
-                    Delete Invoice
+                    Delete
                 </span>
             </button>
         </div>

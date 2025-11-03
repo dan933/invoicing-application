@@ -46,6 +46,7 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { PdfService } from '../../services/pdf-service/pdf-service';
 
 export const DD_MM_YYYY_FORMAT = {
   parse: {
@@ -89,6 +90,7 @@ export class InvoiceDetails implements OnInit {
   snackbar = inject(SnackbarService);
   invoiceService = inject(InvoiceService);
   customerService = inject(CustomerService);
+  pdfService = inject(PdfService);
 
   fb = inject(FormBuilder);
 
@@ -99,6 +101,8 @@ export class InvoiceDetails implements OnInit {
   invoiceReference = signal<string>('');
 
   readonly deleteDialog = inject(MatDialog);
+
+  invoiceData: InvoiceDetailsType | null = null;
 
   invoice = this.fb.group({
     invoiceDate: [new Date(), Validators.required],
@@ -131,6 +135,20 @@ export class InvoiceDetails implements OnInit {
     ]),
   });
 
+  constructor() {
+    this.onPageLoad();
+  }
+
+  ngOnInit(): void {
+    this.customerFilterOptions = this.selectedCustomer.valueChanges.pipe(
+      startWith(''),
+      switchMap((value) => {
+        const searchTerm = typeof value === 'string' ? value : value?.customerCode || '';
+        return this.customerService.searchCustomers(searchTerm);
+      })
+    );
+  }
+
   async getInvoice() {
     if (this.invoiceId) {
       this.loading.set(true);
@@ -146,6 +164,7 @@ export class InvoiceDetails implements OnInit {
       console.log(invoice?.lineItems);
 
       if (invoice) {
+        this.invoiceData = invoice;
         this.invoiceReference.set(invoice.invoiceReference);
         this.customerId = invoice.customerId;
         this.invoice.patchValue({
@@ -185,20 +204,6 @@ export class InvoiceDetails implements OnInit {
   async onPageLoad() {
     await this.getInvoice();
     await this.getCustomer();
-  }
-
-  constructor() {
-    this.onPageLoad();
-  }
-
-  ngOnInit(): void {
-    this.customerFilterOptions = this.selectedCustomer.valueChanges.pipe(
-      startWith(''),
-      switchMap((value) => {
-        const searchTerm = typeof value === 'string' ? value : value?.customerCode || '';
-        return this.customerService.searchCustomers(searchTerm);
-      })
-    );
   }
 
   customerCodeDisplayFn(value: Customer) {
@@ -380,6 +385,12 @@ export class InvoiceDetails implements OnInit {
     }
 
     this.snackbar.error('Failed to delete invoice');
+  }
+
+  downloadPdf() {
+    if (!this.invoiceData) return;
+
+    this.pdfService.makePdf(this.invoiceData);
   }
 
   @HostListener('window:resize', ['$event'])
