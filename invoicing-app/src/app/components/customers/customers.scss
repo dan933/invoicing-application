@@ -56,12 +56,17 @@ table {
   position: relative; display: flex; gap: 15px; flex-wrap: wrap;
 }
 
-.customer-row{
+.customer-row, .status-icon-check, .status-icon-cancel{
   cursor: pointer;
 
 
   &:hover{
     background-color: var(--primary-dark);
-    color: var(--white);
+    color: var(--white) !important;
   }
+}
+
+.customer-row:hover .status-icon-check,
+.customer-row:hover .status-icon-cancel {
+  color: white !important;
 }

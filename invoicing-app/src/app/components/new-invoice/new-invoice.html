@@ -225,17 +225,18 @@
         </button>
     </div>
 
-    <div class="totals-section">
+    <div class="save-section">
+        <button style="position: relative; margin-bottom: 2rem; height: 50px;" mat-raised-button color="primary"
+            [class]="`btn ${!isValidForm ? 'btn-disabled' : ''}`" (click)="createInvoice()">
+            <mat-icon>save</mat-icon>
+            <span style="position: relative; bottom: 6px;">
+                Create Invoice
+            </span>
+        </button>
+    </div>
 
-        <div class="save-section">
-            <button style="position: relative; margin-bottom: 2rem; height: 50px;" mat-raised-button color="primary"
-                [class]="`btn ${!isValidForm ? 'btn-disabled' : ''}`" (click)="createInvoice()">
-                <mat-icon>save</mat-icon>
-                <span style="position: relative; bottom: 6px;">
-                    Create Invoice
-                </span>
-            </button>
-        </div>
+    <div class="totals-section">
+        <div></div>
         <div class="totals-container">
             @if (invoice.value.gst) {
             <div class="total-row">

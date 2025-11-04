@@ -224,4 +224,16 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     }
 }
 
+.status-icon-check {
+  color: var(--success);
+}
 
+.status-icon-cancel {
+  color: var(--danger);
+}
+
+.hover-text-white{
+  &:hover {
+    color: var(--white);
+  }
+}

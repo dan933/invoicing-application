@@ -92,6 +92,12 @@ table {
   }
 }
 
+.customer-row:hover .status-icon-check,
+.customer-row:hover .status-icon-cancel {
+  color: white !important;
+}
+
+
 @media screen and (width <= 369px) {
   .customer-btn-container{
     flex-direction: column;

@@ -199,11 +199,19 @@
                 </ng-container>
                 <ng-container matColumnDef="paid">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>Paid</th>
-                    <td mat-cell *matCellDef="let row">{{row.paid}}</td>
+                    <td mat-cell *matCellDef="let row">
+                        <mat-icon [class]="`${row.paid ? 'status-icon-check': 'status-icon-cancel'}`">
+                            {{row.paid ? 'check_circle' : 'cancel'}}
+                        </mat-icon>
+                    </td>
                 </ng-container>
                 <ng-container matColumnDef="gst">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>GST</th>
-                    <td mat-cell *matCellDef="let row">{{row.gst}}</td>
+                    <td mat-cell *matCellDef="let row">
+                        <mat-icon [class]="`${row.gst ? 'status-icon-check': 'status-icon-cancel'}`">
+                            {{row.gst ? 'check_circle' : 'cancel'}}
+                        </mat-icon>
+                    </td>
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

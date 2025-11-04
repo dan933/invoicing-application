@@ -243,31 +243,32 @@
         </button>
     </div>
 
-    <div class="totals-section">
+    <div class="action-container">
+        <button style="position: relative; margin-bottom: 2rem; height: 50px;" mat-raised-button color="primary"
+            [class]="`btn ${!isValidForm ? 'btn-disabled' : ''}`" (click)="updateInvoice()">
+            <mat-icon>save</mat-icon>
+            <span style="position: relative; bottom: 6px;">
+                Save
+            </span>
+        </button>
+        <button style="position: relative; margin-bottom: 2rem; height: 50px;" mat-raised-button color="primary"
+            [class]="`btn ${!isValidForm ? 'btn-disabled' : ''}`" (click)="downloadPdf()">
+            <mat-icon>download</mat-icon>
+            <span style="position: relative; bottom: 6px;">
+                Download
+            </span>
+        </button>
+        <button style="position: relative; margin-bottom: 2rem; height: 50px;" mat-raised-button color="primary"
+            class="btn btn-warn" (click)="openDeleteDialog()">
+            <mat-icon>delete</mat-icon>
+            <span style="position: relative; bottom: 6px;">
+                Delete
+            </span>
+        </button>
+    </div>
 
-        <div class="save-section">
-            <button style="position: relative; margin-bottom: 2rem; height: 50px;" mat-raised-button color="primary"
-                [class]="`btn ${!isValidForm ? 'btn-disabled' : ''}`" (click)="updateInvoice()">
-                <mat-icon>save</mat-icon>
-                <span style="position: relative; bottom: 6px;">
-                    Save
-                </span>
-            </button>
-            <button style="position: relative; margin-bottom: 2rem; height: 50px;" mat-raised-button color="primary"
-                [class]="`btn ${!isValidForm ? 'btn-disabled' : ''}`" (click)="downloadPdf()">
-                <mat-icon>download</mat-icon>
-                <span style="position: relative; bottom: 6px;">
-                    Download
-                </span>
-            </button>
-            <button style="position: relative; margin-bottom: 2rem; height: 50px;" mat-raised-button color="primary"
-                class="btn btn-warn" (click)="openDeleteDialog()">
-                <mat-icon>delete</mat-icon>
-                <span style="position: relative; bottom: 6px;">
-                    Delete
-                </span>
-            </button>
-        </div>
+    <div class="totals-section">
+        <div></div>
         <div class="totals-container">
             @if (invoice.value.gst) {
             <div class="total-row">
