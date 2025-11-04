@@ -1,10 +1,18 @@
 <nav [class]="scrollY() > 0 || !isFloatingNav()? 'nav-float' : ''">
-    <h1 class="site-title">{{navService.siteTitle}}</h1>
+    <h1 class="site-title" style="cursor: pointer;" (click)="navLanding()">{{navService.siteTitle}}</h1>
 
+    @if(auth.isLoggedIn()){
     @for (item of navService.menuItems(); track $index) {
     <li [class]="{'nav-item':true, 'nav-active': currentUrl() === item.link}" (click)="onLinkClick(item.link)">
         {{item.label}}
     </li>
+    }
+
+
+    <button class="logout-btn" (click)="logout()">
+        Logout
+    </button>
+
     }
 
     @if(navService.showTryDemoButton()){

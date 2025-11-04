@@ -20,6 +20,15 @@ resource apiWebApp 'Microsoft.Web/sites@2022-03-01' = {
   properties: {
     serverFarmId: appServicePlan.id
     httpsOnly: true
+    siteConfig: {
+      netFrameworkVersion: 'v8.0'
+      appSettings: [
+        {
+          name: 'ConnectionStrings__DefaultConnection'
+          value: 'Host=${postgresServer.properties.fullyQualifiedDomainName};Database=${postgresDatabase.name};Username=pgadmin;Password=${adminPassword}'
+        }
+      ]
+    }
   }
 }
 

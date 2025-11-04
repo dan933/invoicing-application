@@ -67,3 +67,21 @@ nav{
     }
 }
 
+.logout-btn{
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    margin-left: auto;
+    padding: 8px 16px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    
+    &:hover {
+        background: #c82333;
+    }
+}
+

@@ -2,6 +2,7 @@ import { Component, HostListener, inject, OnDestroy, OnInit, signal } from '@ang
 import { NavService } from '../../services/nav/nav';
 import { Event as RouterEvent, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { Auth } from '../../services/auth/auth';
 
 @Component({
   selector: 'app-nav',
@@ -12,6 +13,7 @@ import { Subscription } from 'rxjs';
 export class Nav implements OnInit, OnDestroy {
   router = inject(Router);
   navService = inject(NavService);
+  auth = inject(Auth);
   screenWidth = signal(window.innerWidth);
   scrollY = signal<number>(0);
   isFloatingNav = signal<boolean>(false);
@@ -49,6 +51,15 @@ export class Nav implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {}
+
+  logout() {
+    this.auth.removeToken();
+    this.router.navigate(['/login']);
+  }
+
+  navLanding() {
+    this.router.navigate(['/']);
+  }
 
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
