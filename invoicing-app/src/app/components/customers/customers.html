@@ -1,5 +1,54 @@
 <section class="page">
-    <h1>Customers</h1>
+    <div class="status-container container">
+        <div class="stauts-card">
+            @if(isLoadingResults()){
+            <mat-spinner diameter="30" strokeWidth="4"></mat-spinner>
+            }
+
+            @if(!isLoadingResults()){
+            <span>
+                <mat-icon class="status-icon">person</mat-icon>
+                Customers
+            </span>
+            <span>
+                {{customerData().total_count}}
+            </span>
+
+            }
+        </div>
+        <div class="stauts-card">
+            @if(invoiceCountLoading()){
+            <mat-spinner diameter="30" strokeWidth="4"></mat-spinner>
+            }
+
+            @if(!invoiceCountLoading()){
+            <span>
+                <mat-icon class="status-icon">payment</mat-icon>
+                Outstanding Invoices
+            </span>
+            <span>
+                {{invoiceCount()?.outstandingCount || "-"}}
+            </span>
+            }
+
+        </div>
+        <div class="stauts-card">
+            @if(invoiceCountLoading()){
+            <mat-spinner diameter="30" strokeWidth="4"></mat-spinner>
+            }
+
+            @if(!invoiceCountLoading()){
+
+            <span>
+                <mat-icon class="status-icon status-icon-warn">schedule</mat-icon>
+                Overdue Invoices
+            </span>
+            <span>
+                {{invoiceCount()?.overdueCount || "-"}}
+            </span>
+            }
+        </div>
+    </div>
     <div class="customer-btn-container">
         <app-new-customer (customerCreated)="onCustomerCreate()"></app-new-customer>
         <mat-slide-toggle (change)="onToggleChange()" style="position: relative; top: 5px;"

@@ -11,6 +11,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Invoice> Invoices { get; set; }
     public DbSet<InvoiceItem> InvoiceItems { get; set; }
     public DbSet<InvoiceSummary> InvoiceSummaries { get; set; }
+    public DbSet<InvoiceCount> InvoiceCounts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -92,6 +93,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         modelBuilder.Entity<InvoiceSummary>().Property(e => e.Gst).HasColumnName("gst");
         modelBuilder.Entity<InvoiceSummary>().Property(e => e.Paid).HasColumnName("paid");
         modelBuilder.Entity<InvoiceSummary>().HasNoKey();
+
+
+        modelBuilder.Entity<InvoiceCount>().ToView("invoice_count");
+        modelBuilder.Entity<InvoiceCount>().Property(e => e.OutstandingCount).HasColumnName("outstanding_count");
+        modelBuilder.Entity<InvoiceCount>().Property(e => e.OverdueCount).HasColumnName("overdue_count");
+        modelBuilder.Entity<InvoiceCount>().HasNoKey();
+
 
 
     }

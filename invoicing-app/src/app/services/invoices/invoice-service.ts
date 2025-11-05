@@ -191,4 +191,16 @@ export class InvoiceService {
   deleteInvoice(invoiceId: string) {
     return this.api.Delete(`${environment.apiUrl}/invoices/delete/${invoiceId}`);
   }
+
+  async getInvoiceCount(): Promise<{ outstandingCount: number; overdueCount: number } | null> {
+    let resp = await this.api.Get(`${environment.apiUrl}/invoices/count`).then((resp) => {
+      if (resp) {
+        return resp;
+      }
+
+      return null;
+    });
+
+    return resp;
+  }
 }

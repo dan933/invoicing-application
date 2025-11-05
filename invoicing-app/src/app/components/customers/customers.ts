@@ -15,6 +15,8 @@ import { Router } from '@angular/router';
 import { NewCustomer } from './new-customer/new-customer';
 import { Customer, CustomerService } from '../../services/customers/customer-service';
 import { debounceTime } from 'rxjs/operators';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { InvoiceService } from '../../services/invoices/invoice-service';
 
 @Component({
   selector: 'app-customers',
@@ -31,15 +33,27 @@ import { debounceTime } from 'rxjs/operators';
     MatSlideToggleModule,
     FormsModule,
     NewCustomer,
+    MatGridListModule,
   ],
   templateUrl: './customers.html',
   styleUrl: './customers.scss',
 })
 export class Customers implements AfterViewInit {
   customerService = inject(CustomerService);
+  invoiceService = inject(InvoiceService);
+
   router = inject(Router);
+
   filter = new FormControl('');
+
   data: Customer[] = [];
+
+  invoiceCountLoading = signal(false);
+  invoiceCount = signal<{
+    outstandingCount: number;
+    overdueCount: number;
+  } | null>(null);
+
   private _httpClient = inject(HttpClient);
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -82,6 +96,18 @@ export class Customers implements AfterViewInit {
       )
       .finally(() => {
         this.isLoadingResults.set(false);
+      });
+  }
+
+  constructor() {
+    this.invoiceCountLoading.set(true);
+    this.invoiceService
+      .getInvoiceCount()
+      .then((resp) => {
+        this.invoiceCount.set(resp);
+      })
+      .finally(() => {
+        this.invoiceCountLoading.set(false);
       });
   }
 

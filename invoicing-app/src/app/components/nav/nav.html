@@ -1,7 +1,7 @@
 <nav [class]="scrollY() > 0 || !isFloatingNav()? 'nav-float' : ''">
     <h1 class="site-title" style="cursor: pointer;" (click)="navLanding()">{{navService.siteTitle}}</h1>
 
-    @if(auth.isLoggedIn()){
+    @if(auth.isLoggedIn() && navService.menuItems().length){
     @for (item of navService.menuItems(); track $index) {
     <li [class]="{'nav-item':true, 'nav-active': currentUrl() === item.link}" (click)="onLinkClick(item.link)">
         {{item.label}}

@@ -104,5 +104,24 @@ public static class InvoiceRoutes
 
             return Results.Ok(await service.GetInvoice(id));
         }).RequireAuthorization();
+
+
+        endpoints.MapGet("/invoices/count", async (InvoiceService service, PermissionService permissionService, ClaimsPrincipal user) =>
+        {
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim, out var userId))
+            {
+                return Results.Unauthorized();
+            }
+
+            var hasAdminPermission = await permissionService.HasPermission(userId, "Admin");
+            if (!hasAdminPermission)
+            {
+                return Results.Forbid();
+            }
+
+            return Results.Ok(await service.GetInvoiceCount());
+        }).RequireAuthorization();
     }
 };

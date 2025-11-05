@@ -259,4 +259,11 @@ public class InvoiceService(AppDbContext _context)
         return invoiceDetails;
     }
 
+
+    public async Task<InvoiceCount> GetInvoiceCount()
+    {
+        return await _context.InvoiceCounts.FirstAsync();
+    }
+
+
 }

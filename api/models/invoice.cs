@@ -91,3 +91,10 @@ public class InvoiceDetails
     public bool Gst { get; set; } = false;
     public List<InvoiceItemDto> LineItems { get; set; } = [];
 }
+
+
+public class InvoiceCount
+{
+    public int OutstandingCount { get; set; }
+    public int OverdueCount { get; set; }
+}
