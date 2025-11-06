@@ -5,7 +5,7 @@ using api.models;
 namespace api.services;
 
 
-public record PaginatedCustomerResponse(List<Customer> Data, Pagination Pagination);
+public record PaginatedCustomerSummariesResponse(List<CustomerSummary> Data, Pagination Pagination);
 
 public class CustomerService(AppDbContext _context)
 {
@@ -82,7 +82,7 @@ public class CustomerService(AppDbContext _context)
         }
     }
 
-    public async Task<PaginatedCustomerResponse> ListCustomers(PagedRequest listCustomerRequest)
+    public async Task<PaginatedCustomerSummariesResponse> ListCustomerSummaries(PagedRequest listCustomerRequest)
     {
 
         var search = listCustomerRequest.Search;
@@ -92,7 +92,7 @@ public class CustomerService(AppDbContext _context)
         var sortColumn = listCustomerRequest.SortColumn;
         var sortDirection = listCustomerRequest.SortDirection;
 
-        var query = _context.Customers.AsQueryable();
+        var query = _context.CustomerSummaries.AsQueryable();
 
         query = query.Where(c => c.Status == "Active");
 
@@ -116,9 +116,8 @@ public class CustomerService(AppDbContext _context)
 
             var pascalCaseSortColumn = char.ToUpper(sortColumn[0]) + sortColumn[1..].ToLower();
 
-            var property = typeof(Customer).GetProperty(pascalCaseSortColumn,
+            var property = typeof(CustomerSummary).GetProperty(pascalCaseSortColumn,
                 System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-
             if (property != null)
             {
                 var isDescending = sortDirection?.ToLower() == "desc";
@@ -142,7 +141,7 @@ public class CustomerService(AppDbContext _context)
             TotalCount = totalCount
         };
 
-        return new PaginatedCustomerResponse(customers, pagination);
+        return new PaginatedCustomerSummariesResponse(customers, pagination);
     }
 
 

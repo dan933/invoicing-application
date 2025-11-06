@@ -9,7 +9,7 @@ public static class CustomerRoutes
 
     public static void MapCustomerEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapPost("/customers/list", async (PagedRequest request, CustomerService service, PermissionService permissionService, ClaimsPrincipal user) =>
+        endpoints.MapPost("/customers/summary/list", async (PagedRequest request, CustomerService service, PermissionService permissionService, ClaimsPrincipal user) =>
         {
 
             var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -26,7 +26,7 @@ public static class CustomerRoutes
             }
 
 
-            return Results.Ok(await service.ListCustomers(request));
+            return Results.Ok(await service.ListCustomerSummaries(request));
 
         }).RequireAuthorization();
 

@@ -13,6 +13,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<InvoiceSummary> InvoiceSummaries { get; set; }
     public DbSet<InvoiceCount> InvoiceCounts { get; set; }
 
+    public DbSet<CustomerSummary> CustomerSummaries { get; set; }
+
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().ToTable("users");
@@ -77,31 +81,55 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .WithMany()
             .HasForeignKey(i => i.InvoiceId);
 
-        modelBuilder.Entity<InvoiceSummary>().ToView("invoice_summaries");
-        modelBuilder.Entity<InvoiceSummary>().Property(e => e.Id).HasColumnName("id");
-        modelBuilder.Entity<InvoiceSummary>().Property(e => e.CustomerId).HasColumnName("customer_id");
-        modelBuilder.Entity<InvoiceSummary>().Property(e => e.CustomerCode).HasColumnName("customer_code");
-        modelBuilder.Entity<InvoiceSummary>().Property(e => e.FirstName).HasColumnName("first_name");
-        modelBuilder.Entity<InvoiceSummary>().Property(e => e.LastName).HasColumnName("last_name");
-        modelBuilder.Entity<InvoiceSummary>().Property(e => e.Company).HasColumnName("company");
-        modelBuilder.Entity<InvoiceSummary>().Property(e => e.Email).HasColumnName("email");
-        modelBuilder.Entity<InvoiceSummary>().Property(e => e.InvoiceReference).HasColumnName("invoice_reference");
-        modelBuilder.Entity<InvoiceSummary>().Property(e => e.Status).HasColumnName("status");
-        modelBuilder.Entity<InvoiceSummary>().Property(e => e.InvoiceDate).HasColumnName("invoice_date");
-        modelBuilder.Entity<InvoiceSummary>().Property(e => e.DueDate).HasColumnName("due_date");
-        modelBuilder.Entity<InvoiceSummary>().Property(e => e.TotalPrice).HasColumnName("total_price");
-        modelBuilder.Entity<InvoiceSummary>().Property(e => e.Gst).HasColumnName("gst");
-        modelBuilder.Entity<InvoiceSummary>().Property(e => e.Paid).HasColumnName("paid");
-        modelBuilder.Entity<InvoiceSummary>().HasNoKey();
+
+        modelBuilder.Entity<InvoiceSummary>(eb =>
+        {
+            eb.ToView("invoice_summaries");
+            eb.Property(e => e.Id).HasColumnName("id");
+            eb.Property(e => e.CustomerId).HasColumnName("customer_id");
+            eb.Property(e => e.CustomerCode).HasColumnName("customer_code");
+            eb.Property(e => e.FirstName).HasColumnName("first_name");
+            eb.Property(e => e.LastName).HasColumnName("last_name");
+            eb.Property(e => e.Company).HasColumnName("company");
+            eb.Property(e => e.Email).HasColumnName("email");
+            eb.Property(e => e.InvoiceReference).HasColumnName("invoice_reference");
+            eb.Property(e => e.Status).HasColumnName("status");
+            eb.Property(e => e.InvoiceDate).HasColumnName("invoice_date");
+            eb.Property(e => e.DueDate).HasColumnName("due_date");
+            eb.Property(e => e.TotalPrice).HasColumnName("total_price");
+            eb.Property(e => e.Gst).HasColumnName("gst");
+            eb.Property(e => e.Paid).HasColumnName("paid");
+
+        });
+
+        modelBuilder.Entity<InvoiceCount>(eb =>
+        {
+            eb.ToView("invoice_count");
+            eb.Property(e => e.OutstandingCount).HasColumnName("outstanding_count");
+            eb.Property(e => e.OverdueCount).HasColumnName("overdue_count");
+            eb.HasNoKey();
+        });
 
 
-        modelBuilder.Entity<InvoiceCount>().ToView("invoice_count");
-        modelBuilder.Entity<InvoiceCount>().Property(e => e.OutstandingCount).HasColumnName("outstanding_count");
-        modelBuilder.Entity<InvoiceCount>().Property(e => e.OverdueCount).HasColumnName("overdue_count");
-        modelBuilder.Entity<InvoiceCount>().HasNoKey();
-
-
-
+        modelBuilder.Entity<CustomerSummary>(
+            eb =>
+            {
+                eb.HasNoKey();
+                eb.ToView("customer_summaries");
+                eb.Property(e => e.Id).HasColumnName("id");
+                eb.Property(e => e.Status).HasColumnName("status");
+                eb.Property(e => e.CustomerCode).HasColumnName("customer_code");
+                eb.Property(e => e.FirstName).HasColumnName("first_name");
+                eb.Property(e => e.LastName).HasColumnName("last_name");
+                eb.Property(e => e.Company).HasColumnName("company");
+                eb.Property(e => e.Email).HasColumnName("email");
+                eb.Property(e => e.ActiveStatus).HasColumnName("active_status");
+                eb.Property(e => e.OutstandingCount).HasColumnName("outstanding_count");
+                eb.Property(e => e.OverdueCount).HasColumnName("overdue_count");
+                eb.Property(e => e.CreatedAt).HasColumnName("created_at");
+                eb.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            }
+        );
     }
 
 }

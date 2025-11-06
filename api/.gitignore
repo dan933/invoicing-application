@@ -5,6 +5,7 @@ appsettings.Development.json
 bin/
 obj/
 out/
+publish/
 
 # User-specific files
 *.user

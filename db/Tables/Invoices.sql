@@ -40,8 +40,12 @@ WHERE invoices.status = 'Active'
 GROUP BY invoices.id, invoices.customer_id, cust.customer_code, cust.first_name, cust.last_name, cust.company, cust.email,invoice_reference, invoices.status, invoice_date, due_date, gst, paid;
 
 
+DROP VIEW IF EXISTS invoice_count;
+
 CREATE VIEW invoice_count AS
- SELECT 
-  COUNT(CASE WHEN paid = false AND status = 'Active' THEN 1 END) as outstanding_count,
-  COUNT(CASE WHEN paid = false AND status = 'Active' AND due_date < CURRENT_DATE THEN 1 END) as overdue_count
-FROM invoices;
+SELECT 
+    COUNT(CASE WHEN inv.paid = false AND inv.status = 'Active' THEN 1 END) as outstanding_count,
+    COUNT(CASE WHEN inv.paid = false AND inv.status = 'Active' AND due_date < CURRENT_DATE THEN 1 END) as overdue_count
+FROM invoices AS inv
+INNER JOIN customers AS cust ON inv.customer_id = cust.id
+WHERE cust.status = 'Active';

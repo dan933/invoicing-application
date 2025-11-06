@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace api.models;
 
 public class Customer
@@ -22,4 +24,11 @@ public class SetCustomerRequest
     public string Company { get; set; } = "";
     public string Email { get; set; } = "";
     public bool ActiveStatus { get; set; } = true;
+}
+
+[Keyless]
+public class CustomerSummary : Customer
+{
+    public int OutstandingCount { get; set; }
+    public int OverdueCount { get; set; }
 }

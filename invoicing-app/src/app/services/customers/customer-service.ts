@@ -11,6 +11,8 @@ export interface Customer {
   lastName: string;
   company: string;
   email: string;
+  outstandingCount?: number;
+  overdueCount?: number;
   activeStatus: boolean;
 }
 
@@ -47,7 +49,7 @@ export class CustomerService {
     items: Customer[];
     total_count: number;
   }> {
-    const customersResponse = await this.api.Post(`${environment.apiUrl}/customers/list`, {
+    const customersResponse = await this.api.Post(`${environment.apiUrl}/customers/summary/list`, {
       sortColumn: sort,
       sortDirection: order,
       page: page + 1,
@@ -71,7 +73,7 @@ export class CustomerService {
     filter?: string | null,
     showActiveCustomers?: boolean | null
   ): Promise<Customer[]> {
-    const customersResponse = await this.api.Post(`${environment.apiUrl}/customers/list`, {
+    const customersResponse = await this.api.Post(`${environment.apiUrl}/customers/summary/list`, {
       sortColumn: 'customerCode',
       sortDirection: 'desc',
       page: 1,

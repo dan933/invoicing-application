@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace api.models;
 
 public class Invoice
@@ -47,7 +49,7 @@ public class SetInvoiceRequest
     public List<InvoiceItemDto> LineItems { get; set; } = [];
 }
 
-
+[Keyless]
 public class InvoiceSummary
 {
     public Guid Id { get; set; }

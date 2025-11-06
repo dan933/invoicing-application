@@ -66,10 +66,10 @@ export class Customers implements AfterViewInit {
 
   displayedColumns: string[] = [
     'customerCode',
-    'firstName',
-    'lastName',
     'company',
     'email',
+    'outstandingCount',
+    'overdueCount',
     'activeStatus',
   ];
 
@@ -114,6 +114,7 @@ export class Customers implements AfterViewInit {
   ngAfterViewInit() {
     // If the user changes the sort order, reset back to the first page.
     this.sort.sortChange.subscribe(() => {
+      console.log('Sort changed:', this.sort.active, this.sort.direction);
       this.isLoadingResults.set(true);
       this.paginator.pageIndex = 0;
 
