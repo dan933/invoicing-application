@@ -119,6 +119,7 @@ export class InvoiceService {
                 customerId: item.customerId,
                 customerCode: item.customerCode,
                 invoiceDate: new Date(item.invoiceDate).toLocaleDateString('en-GB'),
+                dueDate: new Date(item.dueDate).toLocaleDateString('en-GB'),
                 subTotal: (item.totalPrice / 100).toLocaleString('en-US', {
                   style: 'currency',
                   currency: 'USD',

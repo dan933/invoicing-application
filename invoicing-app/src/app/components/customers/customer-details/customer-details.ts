@@ -60,25 +60,33 @@ export class CustomerDetails implements AfterViewInit {
   invoiceSummaries: InvoiceSummary[] = [];
   customer: Customer | null = null;
 
-  displayedColumns: string[] = ['invoiceReference', 'invoiceDate', 'totalPrice', 'paid', 'gst'];
+  displayedColumns: string[] = [
+    'invoiceReference',
+    'invoiceDate',
+    'dueDate',
+    'totalPrice',
+    'paid',
+    'gst',
+  ];
 
   resultsLength = 0;
   isLoadingInvoices = signal(true);
   customerLoading = signal(true);
 
   ngAfterViewInit() {
-    this.getCustomer();
+    this.getCustomer().then((res) => {
+      this.loadInvoices();
+    });
 
     this.sort.sortChange.subscribe(() => {
       this.paginator.pageIndex = 0;
 
       this.loadInvoices();
     });
-
-    this.loadInvoices();
   }
 
   async loadInvoices() {
+    console.log('this.customer?.id', this.customer?.id);
     this.isLoadingInvoices.set(true);
     await this.invoiceService
       .listInvoices(
