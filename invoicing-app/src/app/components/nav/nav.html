@@ -1,3 +1,4 @@
+@if(screenWidth() > 459){
 <nav [class]="scrollY() > 0 || !isFloatingNav()? 'nav-float' : ''">
     <h1 class="site-title" style="cursor: pointer;" (click)="navLanding()">{{navService.siteTitle}}</h1>
 
@@ -10,7 +11,10 @@
 
 
     <button class="logout-btn" (click)="logout()">
-        Logout
+        <mat-icon>exit_to_app</mat-icon>
+        <span>
+            Logout
+        </span>
     </button>
 
     }
@@ -23,3 +27,53 @@
     </button>
     }
 </nav>
+} @else {
+<nav [class]="scrollY() > 0 || !isFloatingNav()? 'nav-float' : ''">
+    <button class="burger" [class]="{'play': activeMenu}" (click)="toggleMenu()">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+    </button>
+    <h1 class="site-title-mobile" style="cursor: pointer;" (click)="navLanding()">{{navService.siteTitle}}</h1>
+    <div class="nav-drawer" [class]="{'active-drawer': activeMenu}">
+        <div class="nav-drawer-container">
+            <button class="burger relative left-4" [class]="{'play': activeMenu}" (click)="toggleMenu()"
+                style="top:10px;">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            @if(auth.isLoggedIn() && navService.menuItems().length){
+            @for (item of navService.menuItems(); track $index) {
+            <a [routerLink]="item.link" (click)="toggleMenu()" class="nav-item"
+                [class]="currentUrl().includes(item.link) ? 'bg-primaryHover' : ''">
+                <span>
+                    {{item.label}}
+                </span>
+            </a>
+            }
+            <div class="logout-container">
+                <button (click)="[logout(), toggleMenu()]"
+                    class="w-full text-left logout-button text-textColour hover:bg-primaryHover">
+                    <mat-icon>logout</mat-icon>
+                    <span>
+                        Logout
+                    </span>
+                </button>
+            </div>
+            }
+
+            @if(navService.showTryDemoButton()){
+            <a routerLink="/customers" (click)="toggleMenu()" class="nav-item">
+                <span>
+                    Try Demo
+                </span>
+            </a>
+            }
+
+        </div>
+    </div>
+    <div [class]="{'nav-drawer-overlay': true, 'active-overlay': activeMenu}" (click)="toggleMenu()"></div>
+
+</nav>
+}

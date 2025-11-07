@@ -1,12 +1,19 @@
 import { Component, HostListener, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { NavService } from '../../services/nav/nav';
-import { Event as RouterEvent, NavigationEnd, NavigationStart, Router } from '@angular/router';
+import {
+  Event as RouterEvent,
+  NavigationEnd,
+  NavigationStart,
+  Router,
+  RouterModule,
+} from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Auth } from '../../services/auth/auth';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-nav',
-  imports: [],
+  imports: [MatIcon, RouterModule],
   templateUrl: './nav.html',
   styleUrl: './nav.scss',
 })
@@ -18,6 +25,8 @@ export class Nav implements OnInit, OnDestroy {
   scrollY = signal<number>(0);
   isFloatingNav = signal<boolean>(false);
   currentUrl = signal<string>('');
+
+  activeMenu: boolean = false;
 
   routerSubscription: Subscription;
 
@@ -59,6 +68,10 @@ export class Nav implements OnInit, OnDestroy {
 
   navLanding() {
     this.router.navigate(['/']);
+  }
+
+  toggleMenu() {
+    this.activeMenu = !this.activeMenu;
   }
 
   @HostListener('window:resize', ['$event'])
