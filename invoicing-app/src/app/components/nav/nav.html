@@ -29,20 +29,25 @@
 </nav>
 } @else {
 <nav [class]="scrollY() > 0 || !isFloatingNav()? 'nav-float' : ''">
+    @if(navService.menuItems().length || navService.showTryDemoButton()){
     <button class="burger" [class]="{'play': activeMenu}" (click)="toggleMenu()">
         <span class="bar"></span>
         <span class="bar"></span>
         <span class="bar"></span>
     </button>
+    }
     <h1 class="site-title-mobile" style="cursor: pointer;" (click)="navLanding()">{{navService.siteTitle}}</h1>
     <div class="nav-drawer" [class]="{'active-drawer': activeMenu}">
         <div class="nav-drawer-container">
+
             <button class="burger relative left-4" [class]="{'play': activeMenu}" (click)="toggleMenu()"
                 style="top:10px;">
                 <span class="bar"></span>
                 <span class="bar"></span>
                 <span class="bar"></span>
             </button>
+
+
             @if(auth.isLoggedIn() && navService.menuItems().length){
             @for (item of navService.menuItems(); track $index) {
             <a [routerLink]="item.link" (click)="toggleMenu()" class="nav-item"
