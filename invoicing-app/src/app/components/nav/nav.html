@@ -29,7 +29,7 @@
 </nav>
 } @else {
 <nav [class]="scrollY() > 0 || !isFloatingNav()? 'nav-float' : ''">
-    @if(navService.menuItems().length || navService.showTryDemoButton()){
+    @if((auth.isLoggedIn() &&navService.menuItems().length) || navService.showTryDemoButton()){
     <button class="burger" [class]="{'play': activeMenu}" (click)="toggleMenu()">
         <span class="bar"></span>
         <span class="bar"></span>
