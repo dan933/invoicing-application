@@ -9,6 +9,24 @@ export class Api {
   router = inject(Router);
   auth = inject(Auth);
 
+  async PostPublic(url: string, body: any) {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    }).then((res) => {
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      return res.json();
+    });
+
+    return response;
+  }
+
   async Post(url: string, body: any) {
     const token = this.auth.getToken();
 

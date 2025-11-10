@@ -58,11 +58,27 @@
     <div class="content-container-transparent flex wrap gap-20 px-20 justify-center">
         <div class="text-container-large py-15">
             <h1>Contact Us</h1>
-            <form class="contact-form">
-                <input type="text" placeholder="Name" required>
-                <input type="email" placeholder="Email" required>
-                <textarea placeholder="Message" rows="5" required></textarea>
-                <button class="btn" type="submit">Send Message</button>
+            <form class="contact-form" [formGroup]="contactForm">
+                <input type="text" placeholder="Name" required formControlName="name">
+                <input type="email" placeholder="Email" required formControlName="email">
+                <textarea placeholder="Message" rows="5" required formControlName="message"></textarea>
+                <button [disabled]="contactLoading()" class="btn" type="submit" style="height: 55px;"
+                    (click)="submitForm()">
+                    @if(contactLoading()){
+                    <mat-spinner style="margin:auto;" diameter="20" strokeWidth="3"></mat-spinner>
+                    }@else {
+                    <span>
+                        Send Message
+                    </span>
+
+                    }
+                </button>
+                @if(contactSuccess()){
+                <p class="success-message">Your message has been sent successfully!</p>
+                }
+                @if(contactError()){
+                <p class="error-message">There was an error sending your message. Please try again later.</p>
+                }
             </form>
         </div>
     </div>
